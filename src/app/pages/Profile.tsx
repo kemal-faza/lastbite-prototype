@@ -1,4 +1,5 @@
-import { User, Settings, Clock, Heart, Award, ChevronRight, LogOut, Shield, HelpCircle } from 'lucide-react';
+import { User, Settings, Clock, Heart, Award, ChevronRight, LogOut, Shield, HelpCircle, Store } from 'lucide-react';
+import { useNavigate } from 'react-router';
 
 const MENU_ITEMS = [
   { icon: Clock, label: 'Riwayat Pesanan', path: '#' },
@@ -9,6 +10,8 @@ const MENU_ITEMS = [
 ];
 
 export function Profile() {
+  const navigate = useNavigate();
+
   return (
     <div className="flex flex-col min-h-full bg-gray-50 pb-8">
       {/* Profile Header */}
@@ -48,51 +51,59 @@ export function Profile() {
             <span className="text-xl font-bold text-gray-900 leading-none mb-1">450K</span>
             <span className="text-xs text-gray-500">Uang Dihemat</span>
           </div>
-          
           <div className="bg-white p-4 rounded-2xl shadow-sm border border-gray-100 flex flex-col items-center text-center">
-            <div className="w-10 h-10 bg-blue-50 rounded-full flex items-center justify-center mb-2">
-              <Award className="w-5 h-5 text-blue-500" />
+            <div className="w-10 h-10 bg-green-50 rounded-full flex items-center justify-center mb-2">
+              <span className="text-green-600 font-bold text-lg">&#9432;</span>
             </div>
-            <span className="text-xl font-bold text-gray-900 leading-none mb-1">12</span>
-            <span className="text-xs text-gray-500">Porsi Diselamatkan</span>
+            <span className="text-xl font-bold text-gray-900 leading-none mb-1">23</span>
+            <span className="text-xs text-gray-500">Makanan Diselamatkan</span>
           </div>
         </div>
       </div>
 
+      {/* Seller Dashboard Switch */}
+      <div className="px-4 mt-2 mb-2">
+        <button
+          onClick={() => navigate('/seller')}
+          className="w-full bg-white rounded-2xl shadow-sm border border-purple-100 p-4 flex items-center gap-3 hover:shadow-md hover:border-purple-200 transition-all"
+        >
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-600 to-purple-500 flex items-center justify-center shadow-sm">
+            <Store className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1 text-left">
+            <h3 className="font-semibold text-gray-900">Dashboard Penjual</h3>
+            <p className="text-xs text-gray-500">Atur stok dan kelola produkmu</p>
+          </div>
+          <ChevronRight className="w-5 h-5 text-gray-400" />
+        </button>
+      </div>
+
       {/* Menu List */}
-      <div className="px-4 mt-6">
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="px-4 mt-2">
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100 overflow-hidden">
           {MENU_ITEMS.map((item, index) => {
             const Icon = item.icon;
-            const isLast = index === MENU_ITEMS.length - 1;
-            
             return (
-              <button 
+              <button
                 key={index}
-                className={`w-full flex items-center justify-between p-4 bg-white hover:bg-gray-50 transition-colors ${
-                  !isLast ? 'border-b border-gray-100' : ''
-                }`}
+                onClick={() => item.path !== '#' && navigate(item.path)}
+                className="w-full flex items-center gap-3 px-4 py-4 hover:bg-gray-50 transition-colors"
               >
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center">
-                    <Icon className="w-4 h-4 text-gray-600" />
-                  </div>
-                  <span className="text-sm font-medium text-gray-700">{item.label}</span>
-                </div>
-                <ChevronRight className="w-4 h-4 text-gray-400" />
+                <Icon className="w-5 h-5 text-gray-500" />
+                <span className="flex-1 text-sm font-medium text-gray-700 text-left">{item.label}</span>
+                <ChevronRight className="w-4 h-4 text-gray-300" />
               </button>
             );
           })}
         </div>
       </div>
 
-      {/* Logout Button */}
-      <div className="px-4 mt-6 mb-8">
-        <button className="w-full flex items-center justify-center gap-2 py-3.5 bg-white border border-red-200 rounded-xl text-red-500 font-medium hover:bg-red-50 active:scale-[0.98] transition-all">
+      {/* Logout */}
+      <div className="px-4 mt-4">
+        <button className="w-full flex items-center justify-center gap-2 px-4 py-3.5 rounded-2xl border border-red-100 text-red-500 text-sm font-medium hover:bg-red-50 transition-colors">
           <LogOut className="w-4 h-4" />
           Keluar
         </button>
-        <p className="text-center text-xs text-gray-400 mt-4">lastbite v1.0.0</p>
       </div>
     </div>
   );
