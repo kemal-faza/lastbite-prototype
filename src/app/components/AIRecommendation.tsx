@@ -1,7 +1,7 @@
 import { Sparkles, Info } from 'lucide-react';
 import { products, type Product } from '../data/products';
 import { useNavigate } from 'react-router';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 interface AIRecommendationProps {
   currentProductId?: number;
@@ -9,11 +9,20 @@ interface AIRecommendationProps {
 }
 
 type ScoreBreakdown = {
-  category: number;  // kecocokan kategori (0-40)
-  discount: number;  // nilai diskon (0-30)
-  popularity: number; // popularitas dari stok (0-30)
-  total: number;     // total (0-100)
+  category: number;
+  discount: number;
+  popularity: number;
+  total: number;
 };
+
+/**
+ * Pseudo-random stabil berbasis seed.
+ * Outputnya deterministic: seed yang sama -> angka yang sama.
+ */
+function pseudoRandom(seed: number): number {
+  const x = Math.sin(seed * 127.1 + 314.15) * 43758.5453;
+  return x - Math.floor(x);
+}
 
 /**
  * Scoring Logic (dapat dijelaskan):
@@ -34,21 +43,22 @@ function getScoreBreakdown(
   product: Product,
   currentCategory?: string
 ): ScoreBreakdown {
-  // 1. Category Match (0-40)
-  const category = currentCategory && product.category === currentCategory
-    ? 35 + Math.floor(Math.random() * 6) // 35-40
-    : 10 + Math.floor(Math.random() * 11); // 10-20
+  const seed = product.id * 1000 + (currentCategory ? product.category.charCodeAt(0) * 7 : 0);
 
-  // 2. Discount Value (0-30)
+  // 1. Category Match (0-40) -- deterministic dari seed
+  const category = currentCategory && product.category === currentCategory
+    ? 35 + Math.floor(pseudoRandom(seed + 1) * 6) // 35-40
+    : 10 + Math.floor(pseudoRandom(seed + 2) * 11); // 10-20
+
+  // 2. Discount Value (0-30) -- pure logic, no random needed
   const discount = Math.min(30, Math.round(product.discount * 0.6));
 
-  // 3. Popularity - based on remaining stock (0-30)
-  // remaining: 1-3 -> 25-30 (high demand), 4-7 -> 15-24, 8+ -> 5-14
+  // 3. Popularity (0-30) -- deterministic dari seed
   const popularity = product.remaining <= 3
-    ? 25 + Math.floor(Math.random() * 6)
+    ? 25 + Math.floor(pseudoRandom(seed + 3) * 6)
     : product.remaining <= 7
-      ? 15 + Math.floor(Math.random() * 10)
-      : 5 + Math.floor(Math.random() * 10);
+      ? 15 + Math.floor(pseudoRandom(seed + 4) * 10)
+      : 5 + Math.floor(pseudoRandom(seed + 5) * 10);
 
   const total = Math.min(100, category + discount + popularity);
 
@@ -116,7 +126,13 @@ function BreakdownTooltip({ breakdown }: { breakdown: ScoreBreakdown }) {
 export function AIRecommendation({ currentProductId, title }: AIRecommendationProps) {
   const navigate = useNavigate();
   const [tooltipId, setTooltipId] = useState<number | null>(null);
-  const recommendations = getRecommendations(currentProductId);
+
+  // useMemo: rekomendasi cuma dihitung ulang kalo currentProductId berubah
+  const recommendations = useMemo(
+    () => getRecommendations(currentProductId),
+    [currentProductId]
+  );
+
   const displayTitle = title || 'Rekomendasi AI untuk kamu';
 
   if (recommendations.length === 0) return null;
