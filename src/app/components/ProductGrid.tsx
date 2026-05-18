@@ -1,18 +1,56 @@
+import { useMemo } from 'react';
 import { ProductCard } from './ProductCard';
 import { products } from '../data/products';
+import type { SortOption } from './FilterBar';
 
 interface ProductGridProps {
   selectedCategory: string;
   searchQuery: string;
+  sortBy: SortOption;
 }
 
-export function ProductGrid({ selectedCategory, searchQuery }: ProductGridProps) {
-  const filteredProducts = products.filter((product) => {
-    const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
-    const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          product.store.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
-  });
+function parseDistance(d: string): number {
+  return parseInt(d.replace(/\D/g, ''), 10) || 999;
+}
+
+function parseExpiry(e: string): number {
+  const num = parseInt(e.replace(/\D/g, ''), 10) || 0;
+  if (e.includes('menit') || e.includes('min')) return num;
+  if (e.includes('jam')) return num * 60;
+  return 999;
+}
+
+export function ProductGrid({ selectedCategory, searchQuery, sortBy }: ProductGridProps) {
+  const filteredProducts = useMemo(() => {
+    let result = products.filter((product) => {
+      const matchesCategory = selectedCategory === 'all' || product.category === selectedCategory;
+      const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            product.store.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+
+    switch (sortBy) {
+      case 'price-asc':
+        result.sort((a, b) => a.discountedPrice - b.discountedPrice);
+        break;
+      case 'price-desc':
+        result.sort((a, b) => b.discountedPrice - a.discountedPrice);
+        break;
+      case 'distance-asc':
+        result.sort((a, b) => parseDistance(a.distance) - parseDistance(b.distance));
+        break;
+      case 'distance-desc':
+        result.sort((a, b) => parseDistance(b.distance) - parseDistance(a.distance));
+        break;
+      case 'expiry-asc':
+        result.sort((a, b) => parseExpiry(a.expiresIn) - parseExpiry(b.expiresIn));
+        break;
+      default:
+        break;
+    }
+
+    return result;
+  }, [selectedCategory, searchQuery, sortBy]);
 
   return (
     <div>

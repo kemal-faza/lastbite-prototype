@@ -1,0 +1,59 @@
+import { ArrowUpDown, DollarSign, MapPin, Clock } from 'lucide-react';
+
+export type SortOption = 'default' | 'price-asc' | 'price-desc' | 'distance-asc' | 'distance-desc' | 'expiry-asc';
+
+interface FilterBarProps {
+  activeSort: SortOption;
+  onSortChange: (option: SortOption) => void;
+}
+
+const sortOptions: { value: SortOption; label: string; icon: typeof DollarSign }[] = [
+  { value: 'price-asc', label: 'Termurah', icon: DollarSign },
+  { value: 'price-desc', label: 'Termahal', icon: DollarSign },
+  { value: 'distance-asc', label: 'Terdekat', icon: MapPin },
+  { value: 'distance-desc', label: 'Terjauh', icon: MapPin },
+  { value: 'expiry-asc', label: 'Segera Habis', icon: Clock },
+];
+
+export function FilterBar({ activeSort, onSortChange }: FilterBarProps) {
+  return (
+    <div>
+      <div className="flex items-center gap-1.5 mb-2">
+        <ArrowUpDown className="w-3.5 h-3.5 text-gray-500" />
+        <span className="text-xs font-medium text-gray-500">Urutkan</span>
+      </div>
+      <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+        <button
+          onClick={() => onSortChange('default')}
+          className={
+            'px-3 py-1.5 rounded-full text-xs font-medium border transition-colors flex-shrink-0 ' +
+            (activeSort === 'default'
+              ? 'bg-[var(--primary)] border-[var(--primary)] text-white'
+              : 'bg-white border-gray-200 text-gray-600 hover:border-[var(--primary)]/30')
+          }
+        >
+          Default
+        </button>
+        {sortOptions.map((option) => {
+          const Icon = option.icon;
+          const isActive = activeSort === option.value;
+          return (
+            <button
+              key={option.value}
+              onClick={() => onSortChange(option.value)}
+              className={
+                'px-3 py-1.5 rounded-full text-xs font-medium border transition-colors flex items-center gap-1 flex-shrink-0 ' +
+                (isActive
+                  ? 'bg-[var(--primary)] border-[var(--primary)] text-white'
+                  : 'bg-white border-gray-200 text-gray-600 hover:border-[var(--primary)]/30')
+              }
+            >
+              <Icon className={'w-3 h-3 ' + (isActive ? 'text-white' : 'text-gray-400')} />
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
