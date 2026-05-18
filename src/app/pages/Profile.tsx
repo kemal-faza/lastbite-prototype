@@ -14,7 +14,7 @@ import { useNavigate } from 'react-router';
 
 const MENU_ITEMS = [
 	{ icon: Clock, label: 'Riwayat Pesanan', path: '/orders' },
-	{ icon: Heart, label: 'Toko Favorit', path: '/wishlist' },
+	{ icon: Heart, label: 'Menu Favorit', path: '/wishlist' },
 	{ icon: Shield, label: 'Keamanan Akun', path: '#' },
 	{ icon: Settings, label: 'Pengaturan', path: '#' },
 	{ icon: HelpCircle, label: 'Pusat Bantuan', path: '#' },
@@ -90,26 +90,6 @@ export function Profile() {
 						</span>
 					</div>
 				</div>
-			</div>
-
-			{/* Seller Dashboard Switch */}
-			<div className="px-4 mt-2 mb-2">
-				<button
-					onClick={() => navigate('/seller')}
-					className="w-full bg-white rounded-2xl shadow-sm border border-purple-100 p-4 flex items-center gap-3 hover:shadow-md hover:border-purple-200 transition-all">
-					<div className="w-10 h-10 rounded-xl bg-gradient-to-r from-purple-600 to-purple-500 flex items-center justify-center shadow-sm">
-						<Store className="w-5 h-5 text-white" />
-					</div>
-					<div className="flex-1 text-left">
-						<h3 className="font-semibold text-gray-900">
-							Dashboard Penjual
-						</h3>
-						<p className="text-xs text-gray-500">
-							Atur stok dan kelola produkmu
-						</p>
-					</div>
-					<ChevronRight className="w-5 h-5 text-gray-400" />
-				</button>
 			</div>
 
 			{/* Menu List */}
