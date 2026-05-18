@@ -62,7 +62,7 @@ export function ProductCard({ product }: ProductCardProps) {
         )}
         <button
           onClick={(e) => { e.stopPropagation(); toggle(product.id); }}
-          className="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition-all z-10"
+          className="absolute bottom-3 left-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition-all z-10"
           aria-label={isFav ? 'Hapus dari wishlist' : 'Tambah ke wishlist'}
         >
           <Heart

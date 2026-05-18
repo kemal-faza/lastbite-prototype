@@ -3,6 +3,7 @@ import { Minus, Plus, Trash2, ShoppingBag, Tag, ArrowRight, ChevronLeft, Check, 
 import { Link, useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../context/CartContext';
+import { useOrders } from '../context/OrderContext';
 
 const STEPS = ['Keranjang', 'Pembayaran', 'Konfirmasi'];
 
@@ -10,7 +11,7 @@ export function Cart() {
   const { items, removeItem, updateQuantity, clearCart, itemCount, subtotal } = useCart();
   const navigate = useNavigate();
   const [checkoutStep, setCheckoutStep] = useState(1);
-  const [paymentInfo, setPaymentInfo] = useState({ name: '', notes: '' });
+  const [paymentInfo, setPaymentInfo] = useState({ name: '', phone: '', notes: '', method: 'cod' });
 
   const totalOriginal = items.reduce((sum, item) => sum + (item.originalPrice * item.quantity), 0);
   const totalSaved = totalOriginal - subtotal;
@@ -18,10 +19,26 @@ export function Cart() {
   const platformFee = subtotal > 0 ? 2000 : 0;
   const total = subtotal + deliveryFee + platformFee;
 
+  const { addOrder } = useOrders();
+
   const handleConfirmOrder = () => {
     if (items.length > 0) {
-      navigate('/order/confirm/' + items[0].id);
+      addOrder({
+        items: items.map((i) => ({
+          id: i.id,
+          name: i.name,
+          store: i.store,
+          price: i.price,
+          quantity: i.quantity,
+          image: i.image,
+        })),
+        total,
+        paymentMethod: paymentInfo.method,
+        name: paymentInfo.name,
+        phone: paymentInfo.phone,
+      });
       clearCart();
+      navigate('/orders');
     }
   };
 
@@ -180,6 +197,44 @@ export function Cart() {
           />
         </div>
         <div>
+          <label className="text-sm font-medium text-gray-700 block mb-1.5">Nomor Telepon</label>
+          <input
+            type="tel"
+            value={paymentInfo.phone}
+            onChange={(e) => setPaymentInfo((p) => ({ ...p, phone: e.target.value }))}
+            placeholder="08xxxxxxxxxx"
+            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent bg-gray-50"
+          />
+        </div>
+        <div>
+          <label className="text-sm font-medium text-gray-700 block mb-2">Metode Pembayaran</label>
+          <div className="space-y-2">
+            {[
+              { value: 'cod', label: 'Bayar di Tempat (COD)', desc: 'Bayar pas ambil makanan' },
+              { value: 'transfer', label: 'Transfer Bank', desc: 'BCA/Mandiri/BRI' },
+              { value: 'ewallet', label: 'E-Wallet', desc: 'GoPay/OVO/DANA' },
+            ].map((opt) => (
+              <label
+                key={opt.value}
+                className={'flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ' + (paymentInfo.method === opt.value ? 'border-[var(--primary)] bg-[var(--primary)]/5' : 'border-gray-200 bg-white')}
+              >
+                <input
+                  type="radio"
+                  name="paymentMethod"
+                  value={opt.value}
+                  checked={paymentInfo.method === opt.value}
+                  onChange={(e) => setPaymentInfo((p) => ({ ...p, method: e.target.value }))}
+                  className="mt-0.5 accent-[var(--primary)]"
+                />
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{opt.label}</p>
+                  <p className="text-xs text-gray-500">{opt.desc}</p>
+                </div>
+              </label>
+            ))}
+          </div>
+        </div>
+        <div>
           <label className="text-sm font-medium text-gray-700 block mb-1.5">Catatan (opsional)</label>
           <textarea
             value={paymentInfo.notes}
@@ -244,11 +299,21 @@ export function Cart() {
             <span className="font-medium text-gray-900">{paymentInfo.name || '-'}</span>
           </div>
           <div className="flex justify-between">
+            <span>Telepon</span>
+            <span className="font-medium text-gray-900">{paymentInfo.phone || '-'}</span>
+          </div>
+          <div className="flex justify-between">
+            <span>Pembayaran</span>
+            <span className="font-medium text-gray-900">{
+              paymentInfo.method === 'cod' ? 'Bayar di Tempat' : paymentInfo.method === 'transfer' ? 'Transfer Bank' : 'E-Wallet'
+            }</span>
+          </div>
+          <div className="flex justify-between">
             <span>Catatan</span>
             <span className="font-medium text-gray-900">{paymentInfo.notes || '-'}</span>
-          </div>
-        </div>
       </div>
+    </div>
+    </div>
     </div>
   );
 
@@ -352,6 +417,7 @@ export function Cart() {
       {/* Content */}
       <AnimatePresence mode="wait">
         <motion.div
+          className="pb-[172px]"
           key={checkoutStep}
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
