@@ -60,7 +60,7 @@ export function ProductGrid({ selectedCategory, searchQuery, sortBy }: ProductGr
         </h2>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 pb-32">
+      <div className="grid grid-cols-1 gap-4 pb-4">
         {filteredProducts.map((product) => (
           <ProductCard key={product.id} product={product} />
         ))}
