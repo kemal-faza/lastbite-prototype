@@ -38,7 +38,7 @@ export function DetailProduct() {
 	const { id } = useParams();
 	const navigate = useNavigate();
   const { addItem } = useCart();
-
+      
 	const product = products.find((p) => p.id === Number(id));
 
 	if (!product) {
@@ -262,13 +262,13 @@ export function DetailProduct() {
 			{/* Fixed bottom CTA */}
 			<div className="fixed bottom-13 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-sm border-t border-gray-100 px-4 py-3 z-40">
 				<button
-					onClick={() => navigate(`/order/confirm/${product.id}`)}
+					onClick={() => { addItem({ id: product.id, name: product.name, store: product.store, price: product.discountedPrice, originalPrice: product.originalPrice, image: product.image }); navigate('/cart'); }}
 					className="w-full bg-[var(--primary)] text-white font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 hover:bg-[var(--primary)]/90 active:scale-[0.98] transition-all">
 					<ShoppingBag className="w-5 h-5" />
-					Ambil Pesanan Ini
+					Beli
 				</button>
 				<p className="text-center text-gray-400 text-xs mt-1.5">
-					Pick up &lt;30 menit
+					Lanjut ke keranjang untuk checkout
 				</p>
 			</div>
 		</div>
