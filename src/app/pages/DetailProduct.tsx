@@ -42,7 +42,7 @@ export function DetailProduct() {
       </header>
 
       {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto pb-28">
+      <div className="flex-1 overflow-y-auto pb-44">
         {/* Product image */}
         <div className="relative">
           <img
@@ -188,7 +188,7 @@ export function DetailProduct() {
       </div>
 
       {/* Fixed bottom CTA */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-sm border-t border-gray-100 px-4 py-3 z-30">
+      <div className="fixed bottom-[72px] left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-sm border-t border-gray-100 px-4 py-3 z-40">
         <button
           onClick={() => navigate(`/order/confirm/${product.id}`)}
           className="w-full bg-[var(--primary)] text-white font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 hover:bg-[var(--primary)]/90 active:scale-[0.98] transition-all"
