@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer, type ReactNode } from 'react';
+import { useEffect } from 'react';
 
 export interface OrderItem {
   id: number;
@@ -65,8 +66,19 @@ const OrderContext = createContext<{
 } | null>(null);
 
 export function OrderProvider({ children }: { children: ReactNode }) {
-  const [state, dispatch] = useReducer(orderReducer, { orders: [] });
+  const [state, dispatch] = useReducer(orderReducer, { orders: [] }, () => {
+    try {
+      const saved = localStorage.getItem('lastbite-orders');
+      return saved ? JSON.parse(saved) : { orders: [] };
+    } catch {
+      return { orders: [] };
+    }
+  });
 
+  // Persist to localStorage on every state change
+  useEffect(() => {
+    localStorage.setItem('lastbite-orders', JSON.stringify(state));
+  }, [state]);
   const addOrder = (order: Omit<Order, 'id' | 'pickupCode' | 'timestamp' | 'status'>) =>
     dispatch({ type: 'ADD_ORDER', payload: order });
 
