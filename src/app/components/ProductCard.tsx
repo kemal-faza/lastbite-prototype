@@ -1,8 +1,10 @@
-import { Clock, MapPin, ShoppingBag } from 'lucide-react';
-import { useState } from 'react';
+import { Clock, MapPin, ShoppingBag, Heart } from 'lucide-react';
+import { useState, useCallback } from 'react';
 import { motion } from 'motion/react';
 import { type Product } from '../data/products';
 import { useNavigate } from 'react-router';
+import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 
 interface ProductCardProps {
   product: Product;
@@ -10,15 +12,27 @@ interface ProductCardProps {
 
 export function ProductCard({ product }: ProductCardProps) {
   const [isAdded, setIsAdded] = useState(false);
+  const [imgError, setImgError] = useState(false);
   const navigate = useNavigate();
+  const { addItem } = useCart();
+  const { toggle, isWishlisted } = useWishlist();
+  const isFav = isWishlisted(product.id);
 
-  const handleAddToCart = (e: React.MouseEvent) => {
+  const handleAddToCart = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
     setIsAdded(true);
+    addItem({
+      id: product.id,
+      name: product.name,
+      store: product.store,
+      price: product.discountedPrice,
+      originalPrice: product.originalPrice,
+      image: product.image,
+    });
     setTimeout(() => {
       navigate('/cart');
     }, 600);
-  };
+  }, [product, addItem, navigate]);
 
   return (
     <motion.div
@@ -27,12 +41,34 @@ export function ProductCard({ product }: ProductCardProps) {
       onClick={() => navigate('/product/' + product.id)}
       className="bg-white rounded-2xl shadow-md border border-gray-100 hover:shadow-xl hover:-translate-y-0.5 transition-all duration-200 cursor-pointer"
     >
-      <div className="relative overflow-hidden rounded-t-2xl">
-        <img
-          src={product.image}
-          alt={product.name}
-          className="w-full h-48 object-cover"
-        />
+      <div className="relative overflow-hidden rounded-t-2xl bg-gray-100">
+        {imgError ? (
+          <div className="w-full h-48 flex items-center justify-center bg-gray-100">
+            <div className="flex flex-col items-center gap-2">
+              <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center">
+                <ShoppingBag className="w-6 h-6 text-gray-400" />
+              </div>
+              <span className="text-xs text-gray-400">{product.name}</span>
+            </div>
+          </div>
+        ) : (
+          <img
+            src={product.image}
+            alt={product.name}
+            className="w-full h-48 object-cover"
+            onError={() => setImgError(true)}
+            loading="lazy"
+          />
+        )}
+        <button
+          onClick={(e) => { e.stopPropagation(); toggle(product.id); }}
+          className="absolute top-3 left-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition-all z-10"
+          aria-label={isFav ? 'Hapus dari wishlist' : 'Tambah ke wishlist'}
+        >
+          <Heart
+            className={'w-4 h-4 ' + (isFav ? 'fill-red-500 text-red-500' : 'text-gray-600')}
+          />
+        </button>
         <div className="absolute top-3 right-3 bg-[var(--destructive)] text-white px-3 py-1 rounded-full font-bold text-sm shadow-lg">
           -{product.discount}%
         </div>
@@ -71,11 +107,13 @@ export function ProductCard({ product }: ProductCardProps) {
           <motion.button
             whileTap={{ scale: 0.95 }}
             onClick={handleAddToCart}
-            className={`px-4 py-2 rounded-xl font-medium transition-all flex items-center gap-2 ${
-              isAdded
-                ? 'bg-[var(--primary)]/10 text-[var(--primary)]'
-                : 'bg-[var(--primary)] text-white hover:bg-[#0d5254]'
-            }`}
+            aria-label={isAdded ? 'Ditambahkan ' + product.name + ' ke keranjang' : 'Beli ' + product.name}
+            className={
+              'min-w-[88px] px-4 py-2 rounded-xl font-medium transition-colors flex items-center justify-center gap-2 ' +
+              (isAdded
+                ? 'bg-[var(--primary)]/10 text-[var(--primary)] cursor-default'
+                : 'bg-[var(--primary)] text-white hover:bg-[#0d5254]')
+            }
           >
             <ShoppingBag className="w-4 h-4" />
             {isAdded ? 'Ditambahkan!' : 'Beli'}
