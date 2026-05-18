@@ -14,7 +14,7 @@ export function Home() {
   const [sortBy, setSortBy] = useState<SortOption>('default');
 
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className="flex flex-col">
       <Header />
       <div className="px-4 pt-4 pb-6 space-y-4">
         <SearchBar value={searchQuery} onChange={setSearchQuery} />

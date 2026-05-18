@@ -33,7 +33,7 @@ export function Search() {
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-white">
+    <div className="flex flex-col bg-white">
       {/* Search Header */}
       <div className="sticky top-0 z-10 bg-white pt-6 pb-3 px-4 border-b border-gray-100">
         <h1 className="text-xl font-bold text-gray-900 mb-4">Pencarian</h1>

@@ -329,7 +329,7 @@ export function Cart() {
   };
 
   return (
-    <div className="flex flex-col min-h-full bg-[var(--background)] pb-28">
+    <div className="flex flex-col bg-[var(--background)]">
       {/* Fixed Header */}
       <div className="bg-white shadow-sm sticky top-0 z-10">
         <div className="px-4 py-4 flex items-center gap-3">
