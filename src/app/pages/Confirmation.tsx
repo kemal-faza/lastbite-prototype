@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router';
 import { ChevronLeft, Check, Clock, MapPin, Navigation } from 'lucide-react';
 import { motion } from 'motion/react';
 import { products } from '../data/products';
+import { QueueIndicator } from '../components/QueueIndicator';
 
 export function Confirmation() {
   const { id } = useParams();
@@ -70,7 +71,8 @@ export function Confirmation() {
           </div>
           <p className="text-2xl font-bold text-[var(--destructive)] mt-1">30:00</p>
         </div>
-
+        <QueueIndicator initialQueue={4} storeName={product.store} />
+HV|
         {/* Order detail card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
           <h3 className="font-semibold text-gray-900 mb-3">Detail Pesanan</h3>

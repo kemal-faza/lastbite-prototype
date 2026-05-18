@@ -3,6 +3,7 @@ import { ChevronLeft, Clock, MapPin, Star, Check, ShoppingBag } from 'lucide-rea
 import { motion } from 'motion/react';
 import { products } from '../data/products';
 import { AIRecommendation } from '../components/AIRecommendation';
+import { QueueIndicator } from '../components/QueueIndicator';
 
 const reviews = [
   { id: 1, name: 'Andi', rating: 5, text: 'Enak banget, ayamnya masih fresh. Recommended buat anak kos!' },
@@ -90,6 +91,9 @@ export function DetailProduct() {
             <p>Diproduksi: 12.00 WIB | Batas konsumsi: 19.00 WIB</p>
           </div>
 
+          {/* Queue */}
+          <QueueIndicator initialQueue={3} storeName={product.store} />
+
           {/* Description */}
           <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
             <h3 className="font-semibold text-gray-900 mb-2">Deskripsi</h3>
@@ -97,6 +101,44 @@ export function DetailProduct() {
               {product.name} dari {product.store}. Masih segar dan layak konsumsi, 
               dibuat pada hari yang sama dengan standar kebersihan terjaga. 
               Hemat hingga {product.discount}% dan bantu kurangi food waste!
+            </p>
+          </div>
+
+          {/* Trust & Safety */}
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
+            <h3 className="font-semibold text-gray-900 mb-3">Kenapa Produk Ini Aman</h3>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="bg-green-50 rounded-xl p-3">
+                <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mb-2">
+                  <Check className="w-4 h-4 text-green-700" />
+                </div>
+                <p className="text-xs font-semibold text-gray-900">Diproduksi Hari Ini</p>
+                <p className="text-[10px] text-gray-500 mt-0.5">Makanan fresh, bukan sisa kemarin</p>
+              </div>
+              <div className="bg-blue-50 rounded-xl p-3">
+                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mb-2">
+                  <Check className="w-4 h-4 text-blue-700" />
+                </div>
+                <p className="text-xs font-semibold text-gray-900">Higienis & Bersih</p>
+                <p className="text-[10px] text-gray-500 mt-0.5">Standar kebersihan terjamin</p>
+              </div>
+              <div className="bg-purple-50 rounded-xl p-3">
+                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center mb-2">
+                  <Check className="w-4 h-4 text-purple-700" />
+                </div>
+                <p className="text-xs font-semibold text-gray-900">Kemasan Food Grade</p>
+                <p className="text-[10px] text-gray-500 mt-0.5">Dikemas dengan standar aman</p>
+              </div>
+              <div className="bg-amber-50 rounded-xl p-3">
+                <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center mb-2">
+                  <Clock className="w-4 h-4 text-amber-700" />
+                </div>
+                <p className="text-xs font-semibold text-gray-900">Batas Konsumsi Jelas</p>
+                <p className="text-[10px] text-gray-500 mt-0.5">Informasi waktu expired transparan</p>
+              </div>
+            </div>
+            <p className="text-[10px] text-gray-400 mt-3 text-center">
+              Setiap produk diperiksa sebelum dipajang. Belanja hemat tetap aman!
             </p>
           </div>
 
@@ -146,7 +188,7 @@ export function DetailProduct() {
       </div>
 
       {/* Fixed bottom CTA */}
-      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white border-t border-gray-100 px-4 py-3 z-20">
+      <div className="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-sm border-t border-gray-100 px-4 py-3 z-30">
         <button
           onClick={() => navigate(`/order/confirm/${product.id}`)}
           className="w-full bg-[var(--primary)] text-white font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 hover:bg-[var(--primary)]/90 active:scale-[0.98] transition-all"
