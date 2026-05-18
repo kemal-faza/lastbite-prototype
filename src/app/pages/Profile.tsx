@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 
 const MENU_ITEMS = [
   { icon: Clock, label: 'Riwayat Pesanan', path: '#' },
-  { icon: Heart, label: 'Toko Favorit', path: '#' },
+  { icon: Heart, label: 'Toko Favorit', path: '/wishlist' },
   { icon: Shield, label: 'Keamanan Akun', path: '#' },
   { icon: Settings, label: 'Pengaturan', path: '#' },
   { icon: HelpCircle, label: 'Pusat Bantuan', path: '#' },

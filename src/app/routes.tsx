@@ -7,6 +7,7 @@ import { Profile } from "./pages/Profile";
 import { DetailProduct } from "./pages/DetailProduct";
 import { Confirmation } from "./pages/Confirmation";
 import { Orders } from "./pages/Orders";
+import { Wishlist } from "./pages/Wishlist";
 import { SellerDashboard } from "./pages/SellerDashboard";
 import { AddProduct } from "./pages/AddProduct";
 export const router = createBrowserRouter([
@@ -21,6 +22,7 @@ export const router = createBrowserRouter([
       { path: "profile", Component: Profile },
       { path: "product/:id", Component: DetailProduct },
       { path: "order/confirm/:id", Component: Confirmation },
+      { path: "wishlist", Component: Wishlist },
     ],
   },
   { path: "/seller", Component: SellerDashboard },
