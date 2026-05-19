@@ -66,7 +66,7 @@ export function Orders() {
                 </div>
                 {isPending && (
                   <button
-                    onClick={() => navigate('/order/confirm/' + order.items[0].id)}
+                    onClick={() => navigate('/order/confirm/' + order.id)}
                     className="w-full py-3 bg-[var(--primary)] text-white text-sm font-semibold rounded-xl hover:bg-[#0d5254] transition-colors active:scale-[0.98] flex items-center justify-center gap-2"
                   >
                     <Clock className="w-4 h-4" />

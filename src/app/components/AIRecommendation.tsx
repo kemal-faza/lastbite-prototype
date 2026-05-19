@@ -172,10 +172,19 @@ export function AIRecommendation({
 			{/* Product cards */}
 			<div className="grid grid-cols-2 gap-3">
 				{recommendations.map((product) => (
-					<button
+					<article
 						key={product.id}
 						onClick={() => navigate(`/product/${product.id}`)}
-						className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-left overflow-hidden relative">
+						onKeyDown={(event) => {
+							if (event.key === 'Enter' || event.key === ' ') {
+								event.preventDefault();
+								navigate(`/product/${product.id}`);
+							}
+						}}
+						role="button"
+						tabIndex={0}
+						aria-label={`Lihat detail ${product.name}`}
+						className="bg-white rounded-xl border border-gray-100 shadow-sm hover:shadow-md transition-all text-left overflow-hidden relative cursor-pointer focus:outline-none focus:ring-2 focus:ring-[var(--primary)]">
 						<div className="relative">
 							<img
 								src={product.image}
@@ -188,12 +197,14 @@ export function AIRecommendation({
 								<button
 									onClick={(e) => {
 										e.stopPropagation();
+										e.preventDefault();
 										setTooltipId(
 											tooltipId === product.id
 												? null
 												: product.id,
 										);
 									}}
+									aria-label={`Lihat rincian skor ${product.name}`}
 									className="hover:text-purple-300">
 									<Info className="w-3 h-3" />
 								</button>
@@ -230,7 +241,7 @@ export function AIRecommendation({
 								</span>
 							</div>
 						</div>
-					</button>
+					</article>
 				))}
 			</div>
 

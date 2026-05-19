@@ -21,12 +21,6 @@ export function AddProduct() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({
-      productName,
-      quantity,
-      price,
-      notes,
-    });
     navigate('/seller');
   };
 

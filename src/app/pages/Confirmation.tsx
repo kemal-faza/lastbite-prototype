@@ -1,16 +1,20 @@
 import { useParams, useNavigate } from 'react-router';
 import { ChevronLeft, Check, Clock, MapPin, Navigation } from 'lucide-react';
 import { motion } from 'motion/react';
-import { products } from '../data/products';
 import { QueueIndicator } from '../components/QueueIndicator';
+import { useOrders } from '../context/OrderContext';
+import { useState } from 'react';
 
 export function Confirmation() {
 	const { id } = useParams();
 	const navigate = useNavigate();
+	const { getOrderById, markPickedUp } = useOrders();
+	const [pickupCodeInput, setPickupCodeInput] = useState('');
+	const [pickupError, setPickupError] = useState('');
 
-	const product = products.find((p) => p.id === Number(id));
+	const order = id ? getOrderById(id) : undefined;
 
-	if (!product) {
+	if (!order) {
 		return (
 			<div className="flex flex-col items-center justify-center h-full p-4">
 				<p className="text-gray-500 mb-4">Pesanan tidak ditemukan</p>
@@ -23,7 +27,22 @@ export function Confirmation() {
 		);
 	}
 
-	const pickupCode = `LAST-${1000 + product.id * 7}`;
+	const storeNames = Array.from(
+		new Set(order.items.map((item) => item.store)),
+	);
+	const primaryStoreName =
+		storeNames.length === 1 ? storeNames[0] : 'Beberapa Toko';
+	const isPendingPickup = order.status === 'pending-pickup';
+
+	const handlePickupCompleted = () => {
+		const success = markPickedUp(order.id, pickupCodeInput);
+		if (!success) {
+			setPickupError('Kode pickup tidak sesuai. Periksa kembali kode Anda.');
+			return;
+		}
+		setPickupError('');
+		navigate('/orders');
+	};
 
 	return (
 		<div className="flex flex-col h-full w-full">
@@ -57,7 +76,7 @@ export function Confirmation() {
 					<p className="text-gray-500 text-sm mb-2">Kode Pickup:</p>
 					<div className="bg-[var(--secondary)]/10 rounded-xl p-4 inline-block">
 						<p className="text-3xl font-bold tracking-widest text-gray-900">
-							{pickupCode}
+							{order.pickupCode}
 						</p>
 					</div>
 				</div>
@@ -75,33 +94,42 @@ export function Confirmation() {
 				</div>
 				<QueueIndicator
 					initialQueue={4}
-					storeName={product.store}
+					storeName={primaryStoreName}
 				/>
-				HV|
 				{/* Order detail card */}
 				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
 					<h3 className="font-semibold text-gray-900 mb-3">
 						Detail Pesanan
 					</h3>
-					<div className="flex items-start gap-3">
-						<img
-							src={product.image}
-							alt={product.name}
-							className="w-16 h-16 rounded-xl object-cover"
-						/>
-						<div className="flex-1">
-							<p className="font-semibold text-gray-900">
-								{product.name}
-							</p>
-							<p className="text-gray-500 text-sm">
-								{product.store}
-							</p>
-							<p className="text-[var(--secondary)] font-bold mt-1">
-								1x Rp
-								{product.discountedPrice.toLocaleString(
-									'id-ID',
-								)}
-							</p>
+					<div className="space-y-3">
+						{order.items.map((item) => (
+							<div
+								key={item.id + '-' + item.name}
+								className="flex items-start gap-3">
+								<img
+									src={item.image}
+									alt={item.name}
+									className="w-16 h-16 rounded-xl object-cover"
+								/>
+								<div className="flex-1">
+									<p className="font-semibold text-gray-900">
+										{item.name}
+									</p>
+									<p className="text-gray-500 text-sm">
+										{item.store}
+									</p>
+									<p className="text-[var(--secondary)] font-bold mt-1">
+										{item.quantity}x Rp{' '}
+										{item.price.toLocaleString('id-ID')}
+									</p>
+								</div>
+							</div>
+						))}
+						<div className="pt-2 border-t border-gray-100 flex items-center justify-between">
+							<span className="text-sm text-gray-500">Total</span>
+							<span className="font-bold text-[var(--secondary)]">
+								Rp {order.total.toLocaleString('id-ID')}
+							</span>
 						</div>
 					</div>
 				</div>
@@ -116,7 +144,7 @@ export function Confirmation() {
 						</div>
 						<div>
 							<p className="font-medium text-gray-900">
-								{product.store}
+								{primaryStoreName}
 							</p>
 							<p className="text-gray-500 text-sm">
 								Jl. Prof. Soedarto, Tembalang
@@ -133,10 +161,32 @@ export function Confirmation() {
 						<Navigation className="w-5 h-5" />
 						Lihat Petunjuk Jalan
 					</button>
+					{isPendingPickup && (
+						<div className="space-y-2">
+							<label className="text-sm font-medium text-gray-700 block">
+								Masukkan Kode Pickup untuk verifikasi
+							</label>
+							<input
+								type="text"
+								value={pickupCodeInput}
+								onChange={(e) => {
+									setPickupCodeInput(e.target.value);
+									if (pickupError) setPickupError('');
+								}}
+								placeholder="LAST-1234"
+								className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] focus:border-transparent bg-gray-50 uppercase"
+								autoCapitalize="characters"
+							/>
+							{pickupError && (
+								<p className="text-sm text-[var(--destructive)]">{pickupError}</p>
+							)}
+						</div>
+					)}
 					<button
-						onClick={() => navigate('/')}
+						onClick={isPendingPickup ? handlePickupCompleted : () => navigate('/orders')}
+						disabled={isPendingPickup && pickupCodeInput.trim().length === 0}
 						className="w-full border-2 border-[var(--primary)] text-[var(--primary)] font-semibold py-3.5 rounded-2xl hover:bg-[var(--primary)]/5 active:scale-[0.98] transition-all">
-						Kembali ke Beranda
+						{isPendingPickup ? 'Saya Sudah Mengambil Pesanan' : 'Kembali ke Pesanan'}
 					</button>
 				</div>
 			</div>

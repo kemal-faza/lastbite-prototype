@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
 	Minus,
 	Plus,
@@ -35,6 +35,8 @@ export function Cart() {
 		notes: '',
 		method: 'cod',
 	});
+	const [isSubmitting, setIsSubmitting] = useState(false);
+	const isSubmittingRef = useRef(false);
 
 	const totalOriginal = items.reduce(
 		(sum, item) => sum + item.originalPrice * item.quantity,
@@ -48,23 +50,39 @@ export function Cart() {
 	const { addOrder } = useOrders();
 
 	const handleConfirmOrder = () => {
-		if (items.length > 0) {
-			addOrder({
-				items: items.map((i) => ({
-					id: i.id,
-					name: i.name,
-					store: i.store,
-					price: i.price,
-					quantity: i.quantity,
-					image: i.image,
-				})),
-				total,
-				paymentMethod: paymentInfo.method,
-				name: paymentInfo.name,
-				phone: paymentInfo.phone,
-			});
+		if (isSubmittingRef.current || items.length === 0) return;
+
+		isSubmittingRef.current = true;
+		setIsSubmitting(true);
+		try {
+			addOrder(
+				{
+					items: items.map((i) => ({
+						id: i.id,
+						name: i.name,
+						store: i.store,
+						price: i.price,
+						quantity: i.quantity,
+						image: i.image,
+					})),
+					total,
+					paymentMethod: paymentInfo.method,
+					name: paymentInfo.name,
+					phone: paymentInfo.phone,
+				},
+				{
+					requestId:
+						typeof crypto !== 'undefined' &&
+						typeof crypto.randomUUID === 'function'
+							? crypto.randomUUID()
+							: 'req-' + Date.now(),
+				},
+			);
 			clearCart();
 			navigate('/orders');
+		} finally {
+			isSubmittingRef.current = false;
+			setIsSubmitting(false);
 		}
 	};
 
@@ -520,9 +538,15 @@ export function Cart() {
 					</button>
 					<button
 						onClick={handleConfirmOrder}
-						className="flex-[2] bg-[var(--secondary)] text-white font-bold py-3.5 px-4 rounded-xl shadow-lg shadow-black/10 hover:bg-[#c9952e] transition-colors active:scale-[0.98] flex items-center justify-center gap-2">
+						disabled={isSubmitting}
+						className={
+							'flex-[2] font-bold py-3.5 px-4 rounded-xl shadow-lg transition-colors active:scale-[0.98] flex items-center justify-center gap-2 ' +
+							(isSubmitting
+								? 'bg-gray-300 text-gray-600 cursor-not-allowed shadow-none'
+								: 'bg-[var(--secondary)] text-white shadow-black/10 hover:bg-[#c9952e]')
+						}>
 						<Check className="w-5 h-5" />
-						Konfirmasi Pesanan
+						{isSubmitting ? 'Memproses...' : 'Konfirmasi Pesanan'}
 					</button>
 				</div>
 			);

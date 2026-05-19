@@ -90,8 +90,9 @@ export function Search() {
 										<div
 											key={index}
 											className="flex items-center justify-between group">
-											<div
-												className="flex items-center gap-3 cursor-pointer flex-1"
+											<button
+												type="button"
+												className="flex items-center gap-3 cursor-pointer flex-1 text-left"
 												onClick={() =>
 													handleSearch(item)
 												}>
@@ -99,7 +100,7 @@ export function Search() {
 												<span className="text-sm text-gray-700">
 													{item}
 												</span>
-											</div>
+											</button>
 											<button
 												onClick={() =>
 													removeRecent(item)
