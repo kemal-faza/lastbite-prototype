@@ -33,7 +33,6 @@ export function Cart() {
 		name: '',
 		phone: '',
 		notes: '',
-		method: 'cod',
 	});
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const isSubmittingRef = useRef(false);
@@ -66,7 +65,7 @@ export function Cart() {
 						image: i.image,
 					})),
 					total,
-					paymentMethod: paymentInfo.method,
+					paymentMethod: 'cod',
 					name: paymentInfo.name,
 					phone: paymentInfo.phone,
 				},
@@ -301,55 +300,13 @@ export function Cart() {
 					<label className="text-sm font-medium text-gray-700 block mb-2">
 						Metode Pembayaran
 					</label>
-					<div className="space-y-2">
-						{[
-							{
-								value: 'cod',
-								label: 'Bayar di Tempat (COD)',
-								desc: 'Bayar pas ambil makanan',
-							},
-							{
-								value: 'transfer',
-								label: 'Transfer Bank',
-								desc: 'BCA/Mandiri/BRI',
-							},
-							{
-								value: 'ewallet',
-								label: 'E-Wallet',
-								desc: 'GoPay/OVO/DANA',
-							},
-						].map((opt) => (
-							<label
-								key={opt.value}
-								className={
-									'flex items-start gap-3 p-3 rounded-xl border-2 cursor-pointer transition-all ' +
-									(paymentInfo.method === opt.value
-										? 'border-[var(--primary)] bg-[var(--primary)]/5'
-										: 'border-gray-200 bg-white')
-								}>
-								<input
-									type="radio"
-									name="paymentMethod"
-									value={opt.value}
-									checked={paymentInfo.method === opt.value}
-									onChange={(e) =>
-										setPaymentInfo((p) => ({
-											...p,
-											method: e.target.value,
-										}))
-									}
-									className="mt-0.5 accent-[var(--primary)]"
-								/>
-								<div>
-									<p className="text-sm font-medium text-gray-900">
-										{opt.label}
-									</p>
-									<p className="text-xs text-gray-500">
-										{opt.desc}
-									</p>
-								</div>
-							</label>
-						))}
+					<div className="rounded-xl border-2 border-[var(--primary)] bg-[var(--primary)]/5 p-3">
+						<p className="text-sm font-medium text-gray-900">
+							Bayar di Tempat (COD)
+						</p>
+						<p className="text-xs text-gray-500">
+							Pembayaran default. Bayar saat mengambil pesanan.
+						</p>
 					</div>
 				</div>
 				<div>
@@ -451,11 +408,7 @@ export function Cart() {
 					<div className="flex justify-between">
 						<span>Pembayaran</span>
 						<span className="font-medium text-gray-900">
-							{paymentInfo.method === 'cod'
-								? 'Bayar di Tempat'
-								: paymentInfo.method === 'transfer'
-									? 'Transfer Bank'
-									: 'E-Wallet'}
+							Bayar di Tempat (COD)
 						</span>
 					</div>
 					<div className="flex justify-between">
