@@ -1,9 +1,10 @@
 import { useParams, useNavigate } from 'react-router';
-import { ChevronLeft, Check, Clock, MapPin, Navigation } from 'lucide-react';
+import { ChevronLeft, Check, Clock, MapPin, Navigation, ShoppingBag } from 'lucide-react';
 import { motion } from 'motion/react';
 import { QueueIndicator } from '../components/QueueIndicator';
 import { useOrders } from '../context/OrderContext';
 import { useState } from 'react';
+import confetti from 'canvas-confetti';
 
 export function Confirmation() {
 	const { id } = useParams();
@@ -11,8 +12,35 @@ export function Confirmation() {
 	const { getOrderById, markPickedUp } = useOrders();
 	const [pickupCodeInput, setPickupCodeInput] = useState('');
 	const [pickupError, setPickupError] = useState('');
+	const [showSuccessScreen, setShowSuccessScreen] = useState(false);
 
 	const order = id ? getOrderById(id) : undefined;
+
+	const triggerConfetti = () => {
+		const duration = 3 * 1000;
+		const end = Date.now() + duration;
+
+		(function frame() {
+			confetti({
+				particleCount: 5,
+				angle: 60,
+				spread: 55,
+				origin: { x: 0 },
+				colors: ['#0f766e', '#d97706', '#10b981', '#fbbf24']
+			});
+			confetti({
+				particleCount: 5,
+				angle: 120,
+				spread: 55,
+				origin: { x: 1 },
+				colors: ['#0f766e', '#d97706', '#10b981', '#fbbf24']
+			});
+
+			if (Date.now() < end) {
+				requestAnimationFrame(frame);
+			}
+		}());
+	};
 
 	if (!order) {
 		return (
@@ -23,6 +51,81 @@ export function Confirmation() {
 					className="text-[var(--primary)] font-medium">
 					Kembali ke Beranda
 				</button>
+			</div>
+		);
+	}
+
+	if (showSuccessScreen) {
+		const storeNames = Array.from(
+			new Set(order.items.map((item) => item.store)),
+		);
+		const primaryStoreName =
+			storeNames.length === 1 ? storeNames[0] : 'Beberapa Toko';
+
+		return (
+			<div className="flex flex-col h-full w-full bg-[var(--background)]">
+				<header className="bg-[var(--primary)] text-white px-4 py-3 flex items-center shrink-0 shadow-sm">
+					<h1 className="text-lg font-semibold mx-auto">Pesanan Selesai</h1>
+				</header>
+				<div className="flex-1 overflow-y-auto px-6 py-10 flex flex-col items-center justify-center text-center space-y-6">
+					<motion.div
+						initial={{ scale: 0 }}
+						animate={{ scale: 1 }}
+						transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+						className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center shadow-lg shadow-green-100/50">
+						<Check className="w-12 h-12 text-green-600" />
+					</motion.div>
+					
+					<div className="space-y-2">
+						<h2 className="text-2xl font-bold text-gray-900 leading-tight">
+							Yuhu! Makanan Diselamatkan
+						</h2>
+						<p className="text-sm text-gray-500 max-w-[280px] mx-auto">
+							Terima kasih banyak! Kamu baru saja mengurangi food waste dan membantu bumi kita tetap lestari.
+						</p>
+					</div>
+
+					{/* Saving Summary Card */}
+					<div className="w-full bg-white rounded-2xl border border-green-100 p-5 shadow-sm space-y-4">
+						<div className="bg-green-50 rounded-xl p-3 flex items-center gap-3">
+							<div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center shrink-0">
+								<ShoppingBag className="w-5 h-5 text-white" />
+							</div>
+							<div className="text-left">
+								<p className="text-xs text-green-700 font-semibold">Bumi Berterima Kasih</p>
+								<p className="text-[10px] text-green-600 leading-tight">Pesanan ini mencegah emisi karbon berbahaya!</p>
+							</div>
+						</div>
+						
+						<div className="border-t border-gray-100 pt-3 space-y-2 text-xs text-gray-600 text-left">
+							<p className="font-semibold text-gray-900 mb-1">Item yang diselamatkan:</p>
+							{order.items.map((item) => (
+								<div key={item.id} className="flex justify-between">
+									<span>{item.quantity}x {item.name}</span>
+									<span className="font-medium text-gray-800">Rp {item.price.toLocaleString('id-ID')}</span>
+								</div>
+							))}
+							<div className="pt-2.5 border-t border-gray-100 flex justify-between font-bold text-gray-900 text-sm">
+								<span>Total Penyelamatan</span>
+								<span className="text-[var(--secondary)]">Rp {order.total.toLocaleString('id-ID')}</span>
+							</div>
+						</div>
+					</div>
+
+					{/* Action Buttons */}
+					<div className="w-full space-y-3 pt-4">
+						<button
+							onClick={() => navigate('/')}
+							className="w-full bg-[var(--primary)] text-white font-semibold py-3.5 rounded-2xl hover:bg-[#0d5254] active:scale-[0.98] transition-all shadow-lg shadow-teal-700/10">
+							Cari Makanan Lagi
+						</button>
+						<button
+							onClick={() => navigate('/orders')}
+							className="w-full border-2 border-[var(--primary)] text-[var(--primary)] font-semibold py-3.5 rounded-2xl hover:bg-[var(--primary)]/5 active:scale-[0.98] transition-all">
+							Lihat Riwayat Pesanan
+						</button>
+					</div>
+				</div>
 			</div>
 		);
 	}
@@ -41,7 +144,8 @@ export function Confirmation() {
 			return;
 		}
 		setPickupError('');
-		navigate('/orders');
+		setShowSuccessScreen(true);
+		triggerConfetti();
 	};
 
 	return (

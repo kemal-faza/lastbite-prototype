@@ -15,6 +15,7 @@ import { useNavigate } from 'react-router';
 const MENU_ITEMS = [
 	{ icon: Clock, label: 'Riwayat Pesanan', path: '/orders' },
 	{ icon: Heart, label: 'Menu Favorit', path: '/wishlist' },
+	{ icon: Store, label: 'Dashboard Mitra', path: '/seller' },
 	{ icon: Shield, label: 'Keamanan Akun', path: '#' },
 	{ icon: Settings, label: 'Pengaturan', path: '#' },
 	{ icon: HelpCircle, label: 'Pusat Bantuan', path: '#' },
@@ -93,7 +94,7 @@ export function Profile() {
 			</div>
 
 			{/* Menu List */}
-			<div className="px-4 mt-2">
+			<div className="px-4 mt-4">
 				<div className="bg-white rounded-2xl shadow-sm border border-gray-100 divide-y divide-gray-100 overflow-hidden">
 					{MENU_ITEMS.map((item, index) => {
 						const Icon = item.icon;

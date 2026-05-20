@@ -1,8 +1,38 @@
-import { Heart, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { Heart, ShoppingBag, ArrowLeft, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useWishlist } from '../context/WishlistContext';
 import { products } from '../data/products';
 import { ProductCard } from '../components/ProductCard';
+import { useState } from 'react';
+
+interface WishlistItemProps {
+  product: any;
+}
+
+function WishlistItem({ product }: WishlistItemProps) {
+  const [notifActive, setNotifActive] = useState(false);
+  return (
+    <div className="bg-white rounded-2xl p-2.5 border border-gray-100 flex flex-col gap-2.5 shadow-sm">
+      <ProductCard product={product} />
+      <div className="flex items-center justify-between pt-2 border-t border-gray-50 px-1">
+        <span className="text-[10px] font-medium text-gray-500">
+          {notifActive ? 'Notifikasi stok aktif' : 'Kabari saya jika stok tersedia kembali'}
+        </span>
+        <button
+          onClick={() => setNotifActive(!notifActive)}
+          className={`p-1.5 rounded-xl border transition-all flex items-center gap-1 text-[10px] font-bold ${
+            notifActive
+              ? 'bg-amber-50 border-amber-200 text-amber-700'
+              : 'bg-gray-50 border-gray-100 text-gray-600 hover:bg-gray-100'
+          }`}
+        >
+          <Bell className={`w-3 h-3 ${notifActive ? 'fill-amber-600' : ''}`} />
+          {notifActive ? 'Aktif' : 'Ingatkan'}
+        </button>
+      </div>
+    </div>
+  );
+}
 
 export function Wishlist() {
   const { ids, count } = useWishlist();
@@ -21,16 +51,16 @@ export function Wishlist() {
         >
           <ArrowLeft className="w-5 h-5 text-gray-700" />
         </button>
-        <h1 className="text-lg font-bold text-gray-900">Favorit</h1>
+        <h1 className="text-lg font-bold text-gray-900">Favorit Saya</h1>
         <span className="text-sm text-gray-500 ml-auto">{count} item</span>
       </div>
 
       {/* Content */}
-      <div className="p-4 flex-1">
+      <div className="p-4 flex-1 pb-28">
         {wishlistedProducts.length > 0 ? (
           <div className="grid grid-cols-1 gap-4">
             {wishlistedProducts.map((product) => (
-              <ProductCard key={product.id} product={product} />
+              <WishlistItem key={product.id} product={product} />
             ))}
           </div>
         ) : (

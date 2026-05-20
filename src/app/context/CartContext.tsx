@@ -1,4 +1,5 @@
 import { createContext, useContext, useReducer, type ReactNode } from 'react';
+import { products } from '../data/products';
 
 export interface CartItem {
   id: number;
@@ -24,11 +25,14 @@ function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD_ITEM': {
       const existing = state.items.find((i) => i.id === action.payload.id);
+      const product = products.find((p) => p.id === action.payload.id);
+      const maxStock = product ? product.remaining : 99;
       if (existing) {
+        const newQty = Math.min(maxStock, existing.quantity + 1);
         return {
           items: state.items.map((i) =>
             i.id === action.payload.id
-              ? { ...i, quantity: i.quantity + 1 }
+              ? { ...i, quantity: newQty }
               : i
           ),
         };
@@ -37,16 +41,19 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     }
     case 'REMOVE_ITEM':
       return { items: state.items.filter((i) => i.id !== action.payload.id) };
-    case 'UPDATE_QUANTITY':
+    case 'UPDATE_QUANTITY': {
+      const product = products.find((p) => p.id === action.payload.id);
+      const maxStock = product ? product.remaining : 99;
       return {
         items: state.items.map((item) => {
           if (item.id === action.payload.id) {
-            const newQuantity = Math.max(1, item.quantity + action.payload.delta);
+            const newQuantity = Math.max(1, Math.min(maxStock, item.quantity + action.payload.delta));
             return { ...item, quantity: newQuantity };
           }
           return item;
         }),
       };
+    }
     case 'CLEAR_CART':
       return { items: [] };
     default:

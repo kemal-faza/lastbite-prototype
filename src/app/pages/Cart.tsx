@@ -15,6 +15,7 @@ import { Link, useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../context/CartContext';
 import { useOrders } from '../context/OrderContext';
+import { products } from '../data/products';
 
 const STEPS = ['Keranjang', 'Pembayaran', 'Konfirmasi'];
 
@@ -165,76 +166,122 @@ export function Cart() {
 	const renderCartItems = () => (
 		<div className="p-4 space-y-4">
 			<div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-				{items.map((item, index) => (
-					<div
-						key={item.id}
-						className={
-							'p-4 flex gap-4' +
-							(index !== items.length - 1
-								? ' border-b border-gray-100'
-								: '')
-						}>
-						<img
-							src={item.image}
-							alt={item.name}
-							className="w-20 h-20 object-cover rounded-xl bg-gray-100"
-						/>
-						<div className="flex-1 flex flex-col justify-between">
-							<div>
-								<div className="flex justify-between items-start">
-									<div>
-										<h3 className="font-semibold text-gray-900 leading-tight">
-											{item.name}
-										</h3>
-										<p className="text-xs text-gray-500 mt-1">
-											{item.store}
-										</p>
-									</div>
-									<button
-										onClick={() => removeItem(item.id)}
-										className="p-1 -mr-1 hover:bg-red-50 rounded-lg transition-colors"
-										aria-label={'Hapus ' + item.name}>
-										<Trash2 className="w-4 h-4 text-red-400 hover:text-red-600" />
-									</button>
-								</div>
-							</div>
-							<div className="flex items-center justify-between mt-3 flex-wrap gap-y-2">
+				{items.map((item, index) => {
+					const productMaster = products.find((p) => p.id === item.id);
+					const maxStock = productMaster ? productMaster.remaining : 99;
+					const isMaxStockReached = item.quantity >= maxStock;
+
+					return (
+						<div
+							key={item.id}
+							className={
+								'p-4 flex gap-4' +
+								(index !== items.length - 1
+									? ' border-b border-gray-100'
+									: '')
+							}>
+							<img
+								src={item.image}
+								alt={item.name}
+								className="w-20 h-20 object-cover rounded-xl bg-gray-100"
+							/>
+							<div className="flex-1 flex flex-col justify-between">
 								<div>
-									<span className="font-bold text-[var(--secondary)] text-sm">
-										Rp {item.price.toLocaleString('id-ID')}
-									</span>
-									<span className="text-xs text-gray-400 line-through ml-2">
-										Rp{' '}
-										{item.originalPrice.toLocaleString(
-											'id-ID',
-										)}
-									</span>
+									<div className="flex justify-between items-start">
+										<div>
+											<h3 className="font-semibold text-gray-900 leading-tight">
+												{item.name}
+											</h3>
+											<p className="text-xs text-gray-500 mt-1">
+												{item.store}
+											</p>
+										</div>
+										<button
+											onClick={() => removeItem(item.id)}
+											className="p-1 -mr-1 hover:bg-red-50 rounded-lg transition-colors"
+											aria-label={'Hapus ' + item.name}>
+											<Trash2 className="w-4 h-4 text-red-400 hover:text-red-600" />
+										</button>
+									</div>
 								</div>
-								<div className="flex items-center gap-3 bg-gray-50 rounded-full px-2 py-1 border border-gray-200">
-									<button
-										onClick={() =>
-											updateQuantity(item.id, -1)
-										}
-										className="w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-sm text-gray-600 active:scale-95 transition-transform hover:shadow-md"
-										aria-label="Kurangi jumlah">
-										<Minus className="w-3 h-3" />
-									</button>
-									<span className="text-sm font-semibold w-5 text-center">
-										{item.quantity}
-									</span>
-									<button
-										onClick={() =>
-											updateQuantity(item.id, 1)
-										}
-										className="w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-sm text-[var(--secondary)] active:scale-95 transition-transform hover:shadow-md"
-										aria-label="Tambah jumlah">
-										<Plus className="w-3 h-3" />
-									</button>
+								<div className="flex items-center justify-between mt-3 flex-wrap gap-y-2">
+									<div>
+										<span className="font-bold text-[var(--secondary)] text-sm">
+											Rp {item.price.toLocaleString('id-ID')}
+										</span>
+										<span className="text-xs text-gray-400 line-through ml-2">
+											Rp{' '}
+											{item.originalPrice.toLocaleString(
+												'id-ID',
+											)}
+										</span>
+									</div>
+									<div className="flex flex-col items-end gap-1">
+										<div className="flex items-center gap-3 bg-gray-50 rounded-full px-2 py-1 border border-gray-200">
+											<button
+												onClick={() =>
+													updateQuantity(item.id, -1)
+												}
+												className="w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-sm text-gray-600 active:scale-95 transition-transform hover:shadow-md"
+												aria-label="Kurangi jumlah">
+												<Minus className="w-3 h-3" />
+											</button>
+											<span className="text-sm font-semibold w-5 text-center">
+												{item.quantity}
+											</span>
+											<button
+												onClick={() =>
+													updateQuantity(item.id, 1)
+												}
+												disabled={isMaxStockReached}
+												className={
+													'w-7 h-7 rounded-full bg-white flex items-center justify-center shadow-sm transition-all ' +
+													(isMaxStockReached
+														? 'opacity-40 text-gray-400 cursor-not-allowed'
+														: 'text-[var(--secondary)] active:scale-95 hover:shadow-md')
+												}
+												aria-label="Tambah jumlah">
+												<Plus className="w-3 h-3" />
+											</button>
+										</div>
+										{isMaxStockReached && (
+											<span className="text-[10px] font-medium text-[var(--destructive)]">
+												Stok maks. tercapai
+											</span>
+										)}
+									</div>
 								</div>
 							</div>
 						</div>
+					);
+				})}
+			</div>
+
+			{/* Ringkasan Pembayaran */}
+			<div className="bg-white rounded-2xl shadow-sm p-4 border border-gray-100 space-y-3">
+				<h3 className="font-semibold text-gray-900 text-sm">
+					Ringkasan Pembayaran
+				</h3>
+				<div className="space-y-2 text-xs">
+					<div className="flex justify-between text-gray-600">
+						<span>Subtotal ({itemCount} item)</span>
+						<span>Rp {subtotal.toLocaleString('id-ID')}</span>
 					</div>
-				))}
+					<div className="flex justify-between text-gray-600">
+						<span>Ongkos Kirim</span>
+						<span>Rp {deliveryFee.toLocaleString('id-ID')}</span>
+					</div>
+					<div className="flex justify-between text-gray-600">
+						<span>Biaya Layanan</span>
+						<span>Rp {platformFee.toLocaleString('id-ID')}</span>
+					</div>
+					<div className="pt-2.5 border-t border-gray-100 flex justify-between items-center font-semibold">
+						<span className="text-gray-900">Total Bayar</span>
+						<span className="text-[var(--secondary)]">
+							Rp {total.toLocaleString('id-ID')}
+						</span>
+					</div>
+				</div>
 			</div>
 
 			<div className="bg-[var(--primary)]/5 rounded-xl p-3 flex items-start gap-3 border border-[var(--primary)]/10">
@@ -350,9 +397,23 @@ export function Cart() {
 						</div>
 					))}
 				</div>
-				<div className="mt-3 pt-3 border-t border-gray-100 flex justify-between font-semibold text-gray-900">
-					<span>Subtotal</span>
-					<span>Rp {subtotal.toLocaleString('id-ID')}</span>
+				<div className="mt-3 pt-3 border-t border-gray-100 space-y-2 text-xs">
+					<div className="flex justify-between text-gray-600">
+						<span>Subtotal</span>
+						<span>Rp {subtotal.toLocaleString('id-ID')}</span>
+					</div>
+					<div className="flex justify-between text-gray-600">
+						<span>Ongkos Kirim</span>
+						<span>Rp {deliveryFee.toLocaleString('id-ID')}</span>
+					</div>
+					<div className="flex justify-between text-gray-600">
+						<span>Biaya Layanan</span>
+						<span>Rp {platformFee.toLocaleString('id-ID')}</span>
+					</div>
+					<div className="pt-2.5 border-t border-gray-100 flex justify-between items-center font-semibold text-sm text-gray-900">
+						<span>Total Bayar</span>
+						<span className="text-[var(--secondary)]">Rp {total.toLocaleString('id-ID')}</span>
+					</div>
 				</div>
 			</div>
 		</div>

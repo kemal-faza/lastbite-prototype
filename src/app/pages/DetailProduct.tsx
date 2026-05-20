@@ -40,10 +40,15 @@ const reviews = [
 export function DetailProduct() {
 	const { id } = useParams();
 	const navigate = useNavigate();
-  const { addItem } = useCart();
+  const { items, addItem } = useCart();
       
 	const product = products.find((p) => p.id === Number(id));
 	const [isMapOpen, setIsMapOpen] = useState(false);
+
+	const cartItem = product ? items.find((item) => item.id === product.id) : undefined;
+	const isOutOfStock = product ? product.remaining <= 0 : true;
+	const isCartFull = product && cartItem ? cartItem.quantity >= product.remaining : false;
+	const cannotBuy = isOutOfStock || isCartFull;
 
 	if (!product) {
 		return (
@@ -94,14 +99,26 @@ export function DetailProduct() {
 				<div className="px-4 py-4 space-y-4">
 					{/* Hygiene badge + name */}
 					<div>
-						<div className="inline-flex items-center gap-1 bg-[var(--primary)]/10 text-[var(--primary)] px-3 py-1 rounded-full text-xs font-medium mb-2">
-							<Check className="w-3 h-3" />
-							Higienis
+						<div className="flex flex-wrap items-center gap-2 mb-2">
+							<div className="inline-flex items-center gap-1 bg-green-50 text-green-700 border border-green-100 px-3 py-1 rounded-full text-xs font-semibold shadow-sm">
+								<ShieldCheck className="w-3.5 h-3.5" />
+								Mitra Terverifikasi
+							</div>
+							<div className="inline-flex items-center gap-1 bg-[var(--primary)]/10 text-[var(--primary)] px-3 py-1 rounded-full text-xs font-medium">
+								<Check className="w-3 h-3" />
+								Higienis A+
+							</div>
 						</div>
-						<h2 className="text-2xl font-bold text-gray-900">
+						<h2 className="text-2xl font-bold text-gray-900 leading-tight">
 							{product.name}
 						</h2>
-						<p className="text-gray-500 text-sm">{product.store}</p>
+						<div className="flex items-center gap-2 mt-1.5 flex-wrap text-xs text-gray-500">
+							<span className="font-semibold text-gray-700">{product.store}</span>
+							<span>•</span>
+							<span className="bg-amber-50 text-amber-700 font-semibold px-1.5 py-0.5 rounded">★ 4.8 (12 ulasan)</span>
+							<span>•</span>
+							<span className="text-green-600 font-medium">350+ diselamatkan</span>
+						</div>
 					</div>
 
 					{/* Price */}
@@ -278,10 +295,16 @@ export function DetailProduct() {
 			{/* Bottom CTA */}
 			<div className="fixed bottom-[72px] left-4 right-4 max-w-[calc(theme(maxWidth.md)-2rem)] mx-auto bg-white/95 backdrop-blur-md border border-gray-100 p-4 z-40 rounded-2xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)]">
 				<button
+					disabled={cannotBuy}
 					onClick={() => { addItem({ id: product.id, name: product.name, store: product.store, price: product.discountedPrice, originalPrice: product.originalPrice, image: product.image }); navigate('/cart'); }}
-					className="w-full bg-[var(--primary)] text-white font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 hover:bg-[var(--primary)]/90 active:scale-[0.98] transition-all">
+					className={
+						'w-full font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all ' +
+						(cannotBuy
+							? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
+							: 'bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90 active:scale-[0.98]')
+					}>
 					<ShoppingBag className="w-5 h-5" />
-					Beli
+					{isOutOfStock ? 'Stok Habis' : isCartFull ? 'Stok di Keranjang Penuh' : 'Beli'}
 				</button>
 				<p className="text-center text-gray-400 text-xs mt-1.5">
 					Lanjut ke keranjang untuk checkout

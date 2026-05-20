@@ -20,13 +20,14 @@ export function SellerDashboard() {
       <header className="bg-[var(--primary)] text-white px-4 py-4 shadow-md">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/')}
-            className="p-1 -ml-1 hover:bg-white/20 rounded-lg transition-colors"
+            onClick={() => navigate('/profile')}
+            className="p-1.5 -ml-1.5 hover:bg-white/20 rounded-xl transition-all flex items-center justify-center text-white"
+            aria-label="Kembali ke Mode Pembeli"
           >
-            <ArrowLeft className="w-6 h-6" />
+            <ArrowLeft className="w-5 h-5" />
           </button>
-          <h1 className="flex-1 text-lg font-semibold">Dashboard</h1>
-          <Store className="w-6 h-6 text-white/80" />
+          <h1 className="flex-1 text-base font-bold text-center">Dashboard Seller</h1>
+          <Store className="w-5 h-5 text-white/80" />
         </div>
       </header>
 
