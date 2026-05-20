@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { FilterModal } from './FilterModal';
 import type { FilterValues } from './FilterModal';
 
-export type SortOption = 'default' | 'price-asc' | 'price-desc' | 'distance-asc' | 'distance-desc' | 'expiry-asc';
+export type SortOption = 'default' | 'price-asc' | 'price-desc' | 'distance-asc' | 'expiry-asc';
 
 interface FilterBarProps {
   activeSort: SortOption;
@@ -16,7 +16,6 @@ const sortOptions: { value: SortOption; label: string; icon: typeof DollarSign }
   { value: 'price-asc', label: 'Termurah', icon: DollarSign },
   { value: 'price-desc', label: 'Termahal', icon: DollarSign },
   { value: 'distance-asc', label: 'Terdekat', icon: MapPin },
-  { value: 'distance-desc', label: 'Terjauh', icon: MapPin },
   { value: 'expiry-asc', label: 'Segera Habis', icon: Clock },
 ];
 

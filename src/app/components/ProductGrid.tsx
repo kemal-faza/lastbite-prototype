@@ -73,12 +73,6 @@ export function ProductGrid({
 						parseDistance(a.distance) - parseDistance(b.distance),
 				);
 				break;
-			case 'distance-desc':
-				result.sort(
-					(a, b) =>
-						parseDistance(b.distance) - parseDistance(a.distance),
-				);
-				break;
 			case 'expiry-asc':
 				result.sort(
 					(a, b) =>

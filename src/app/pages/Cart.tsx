@@ -43,9 +43,9 @@ export function Cart() {
 		0,
 	);
 	const totalSaved = totalOriginal - subtotal;
-	const deliveryFee = subtotal > 0 ? 5000 : 0;
+	const deliveryFee = 0;
 	const platformFee = subtotal > 0 ? 2000 : 0;
-	const total = subtotal + deliveryFee + platformFee;
+	const total = subtotal + platformFee;
 
 	const { addOrder } = useOrders();
 
@@ -268,10 +268,6 @@ export function Cart() {
 						<span>Rp {subtotal.toLocaleString('id-ID')}</span>
 					</div>
 					<div className="flex justify-between text-gray-600">
-						<span>Ongkos Kirim</span>
-						<span>Rp {deliveryFee.toLocaleString('id-ID')}</span>
-					</div>
-					<div className="flex justify-between text-gray-600">
 						<span>Biaya Layanan</span>
 						<span>Rp {platformFee.toLocaleString('id-ID')}</span>
 					</div>
@@ -403,10 +399,6 @@ export function Cart() {
 						<span>Rp {subtotal.toLocaleString('id-ID')}</span>
 					</div>
 					<div className="flex justify-between text-gray-600">
-						<span>Ongkos Kirim</span>
-						<span>Rp {deliveryFee.toLocaleString('id-ID')}</span>
-					</div>
-					<div className="flex justify-between text-gray-600">
 						<span>Biaya Layanan</span>
 						<span>Rp {platformFee.toLocaleString('id-ID')}</span>
 					</div>
@@ -429,10 +421,6 @@ export function Cart() {
 					<div className="flex justify-between text-sm text-gray-600">
 						<span>Subtotal ({itemCount} item)</span>
 						<span>Rp {subtotal.toLocaleString('id-ID')}</span>
-					</div>
-					<div className="flex justify-between text-sm text-gray-600">
-						<span>Ongkos Kirim</span>
-						<span>Rp {deliveryFee.toLocaleString('id-ID')}</span>
 					</div>
 					<div className="flex justify-between text-sm text-gray-600">
 						<span>Biaya Layanan</span>

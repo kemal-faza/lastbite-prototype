@@ -1,4 +1,4 @@
-import { Clock, CheckCircle, Package, ChevronRight, ShoppingBag } from 'lucide-react';
+import { Clock, CheckCircle, Package, ChevronRight, ShoppingBag, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useOrders } from '../context/OrderContext';
 
@@ -10,7 +10,14 @@ export function Orders() {
 
   return (
     <div className="flex flex-col h-full w-full">
-      <header className="bg-[var(--primary)] text-white px-4 py-4 shadow-md">
+      <header className="bg-[var(--primary)] text-white px-4 py-4 shadow-md flex items-center gap-3">
+        <button
+          onClick={() => navigate('/profile')}
+          className="p-1 -ml-1 hover:bg-white/10 rounded-lg transition-colors flex items-center justify-center text-white"
+          aria-label="Kembali ke Profil"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </button>
         <div className="flex items-center gap-3">
           <h1 className="text-lg font-semibold">Pesanan Saya</h1>
           {pendingOrders.length > 0 && (
