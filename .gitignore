@@ -33,3 +33,7 @@ npm-debug.log*
 
 # PDF
 *.pdf
+
+.code-review-graph
+.antigravitycli
+*.txt
