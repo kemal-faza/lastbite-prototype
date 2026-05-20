@@ -2,7 +2,7 @@ import { MapPin } from 'lucide-react';
 
 export function Header() {
   return (
-    <header className="bg-[var(--primary)] text-white px-4 py-4 shadow-md">
+    <header className="bg-[var(--primary)] text-white px-4 py-4 shadow-md sticky top-0 z-20">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-baseline gap-0">

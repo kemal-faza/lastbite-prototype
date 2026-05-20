@@ -1,4 +1,6 @@
-import { ArrowUpDown, DollarSign, MapPin, Clock } from 'lucide-react';
+import { ArrowUpDown, DollarSign, MapPin, Clock, SlidersHorizontal } from 'lucide-react';
+import { useState } from 'react';
+import { FilterModal } from './FilterModal';
 
 export type SortOption = 'default' | 'price-asc' | 'price-desc' | 'distance-asc' | 'distance-desc' | 'expiry-asc';
 
@@ -16,11 +18,22 @@ const sortOptions: { value: SortOption; label: string; icon: typeof DollarSign }
 ];
 
 export function FilterBar({ activeSort, onSortChange }: FilterBarProps) {
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+
   return (
     <div>
-      <div className="flex items-center gap-1.5 mb-2">
-        <ArrowUpDown className="w-3.5 h-3.5 text-gray-500" />
-        <span className="text-xs font-medium text-gray-500">Urutkan</span>
+      <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center gap-1.5">
+          <ArrowUpDown className="w-3.5 h-3.5 text-gray-500" />
+          <span className="text-xs font-medium text-gray-500">Urutkan</span>
+        </div>
+        <button 
+          onClick={() => setIsFilterOpen(true)}
+          className="flex items-center gap-1.5 px-3 py-1 bg-[var(--primary)]/5 text-[var(--primary)] rounded-lg text-xs font-bold border border-[var(--primary)]/10 hover:bg-[var(--primary)]/10 transition-colors"
+        >
+          <SlidersHorizontal className="w-3 h-3" />
+          Filter
+        </button>
       </div>
       <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
         <button
@@ -54,6 +67,11 @@ export function FilterBar({ activeSort, onSortChange }: FilterBarProps) {
           );
         })}
       </div>
+      
+      <FilterModal 
+        isOpen={isFilterOpen} 
+        onClose={() => setIsFilterOpen(false)} 
+      />
     </div>
   );
 }

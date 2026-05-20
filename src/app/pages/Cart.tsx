@@ -545,7 +545,7 @@ export function Cart() {
 			</AnimatePresence>
 
 			{/* Bottom CTA */}
-			<div className="fixed bottom-14 left-0 right-0 bg-white border-t border-gray-200 p-4 z-40 max-w-md mx-auto shadow-[0_-10px_15px_-3px_rgba(0,0,0,0.05)]">
+			<div className="fixed bottom-[72px] left-4 right-4 max-w-[calc(theme(maxWidth.md)-2rem)] mx-auto bg-white/95 backdrop-blur-md border border-gray-100 p-4 z-40 rounded-2xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)]">
 				{renderBottomBar()}
 			</div>
 		</div>

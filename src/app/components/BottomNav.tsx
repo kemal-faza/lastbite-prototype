@@ -1,11 +1,10 @@
-import { Home, Search, ShoppingBag, User, Store } from 'lucide-react';
+import { Home, Search, ShoppingBag, User, Store, Heart } from 'lucide-react';
 import { NavLink } from 'react-router';
 
 const navItems = [
   { id: 'home', path: '/', label: 'Beranda', icon: Home },
   { id: 'search', path: '/search', label: 'Cari', icon: Search },
   { id: 'cart', path: '/cart', label: 'Keranjang', icon: ShoppingBag },
-  { id: 'seller', path: '/seller', label: 'Toko', icon: Store },
   { id: 'profile', path: '/profile', label: 'Profil', icon: User },
 ];
 

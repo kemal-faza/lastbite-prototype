@@ -21,7 +21,7 @@ export function Wishlist() {
         >
           <ArrowLeft className="w-5 h-5 text-gray-700" />
         </button>
-        <h1 className="text-lg font-bold text-gray-900">Wishlist</h1>
+        <h1 className="text-lg font-bold text-gray-900">Favorit</h1>
         <span className="text-sm text-gray-500 ml-auto">{count} item</span>
       </div>
 
@@ -38,7 +38,7 @@ export function Wishlist() {
             <div className="w-24 h-24 bg-red-50 rounded-full flex items-center justify-center mb-6">
               <Heart className="w-12 h-12 text-red-300" />
             </div>
-            <h2 className="text-xl font-bold text-gray-900 mb-2">Wishlist Kosong</h2>
+            <h2 className="text-xl font-bold text-gray-900 mb-2">Favorit Kosong</h2>
             <p className="text-gray-500 mb-8 max-w-[250px]">
               Simpan produk favoritmu dengan menekan icon hati di kartu produk.
             </p>

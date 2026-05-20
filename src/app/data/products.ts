@@ -24,7 +24,7 @@ export const products: Product[] = [
     remaining: 5,
     distance: '120m',
     category: 'meals',
-    image: 'https://images.unsplash.com/photo-1562967914-608f82629710?w=400&h=300&fit=crop',
+    image: '/assets/products/ayam_geprek.png',
   },
   {
     id: 2,
@@ -37,7 +37,7 @@ export const products: Product[] = [
     remaining: 3,
     distance: '200m',
     category: 'meals',
-    image: 'https://images.unsplash.com/photo-1559847844-5315695dadae?w=400&h=300&fit=crop',
+    image: '/assets/products/nasi_padang.png',
   },
   {
     id: 3,
@@ -50,7 +50,7 @@ export const products: Product[] = [
     remaining: 8,
     distance: '350m',
     category: 'bakery',
-    image: 'https://images.unsplash.com/photo-1509365465985-25d11c17e812?w=400&h=300&fit=crop',
+    image: '/assets/products/bakery_surplus.png',
   },
   {
     id: 4,
@@ -63,7 +63,7 @@ export const products: Product[] = [
     remaining: 10,
     distance: '150m',
     category: 'drinks',
-    image: 'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=400&h=300&fit=crop',
+    image: '/assets/products/kopi_susu.png',
   },
   {
     id: 5,
@@ -76,7 +76,7 @@ export const products: Product[] = [
     remaining: 4,
     distance: '280m',
     category: 'meals',
-    image: 'https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?w=400&h=300&fit=crop',
+    image: '/assets/products/nasi_goreng.png',
   },
   {
     id: 6,
@@ -115,6 +115,6 @@ export const products: Product[] = [
     remaining: 2,
     distance: '450m',
     category: 'meals',
-    image: 'https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=400&h=300&fit=crop',
+    image: '/assets/products/mie_ayam.png',
   },
 ];
