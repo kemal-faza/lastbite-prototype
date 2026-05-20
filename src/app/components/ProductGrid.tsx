@@ -2,11 +2,13 @@ import { useMemo } from 'react';
 import { ProductCard } from './ProductCard';
 import { products } from '../data/products';
 import type { SortOption } from './FilterBar';
+import type { FilterValues } from './FilterModal';
 
 interface ProductGridProps {
 	selectedCategory: string;
 	searchQuery: string;
 	sortBy: SortOption;
+	filters: FilterValues;
 }
 
 function parseDistance(d: string): number {
@@ -24,6 +26,7 @@ export function ProductGrid({
 	selectedCategory,
 	searchQuery,
 	sortBy,
+	filters,
 }: ProductGridProps) {
 	const filteredProducts = useMemo(() => {
 		let result = products.filter((product) => {
@@ -35,7 +38,26 @@ export function ProductGrid({
 					.toLowerCase()
 					.includes(searchQuery.toLowerCase()) ||
 				product.store.toLowerCase().includes(searchQuery.toLowerCase());
-			return matchesCategory && matchesSearch;
+			
+			// Filter harga
+			const matchesPrice = product.discountedPrice <= filters.maxPrice;
+			
+			// Filter jarak (konversi km ke meter)
+			const matchesDistance =
+				filters.maxDistance === 10 ||
+				parseDistance(product.distance) <= filters.maxDistance * 1000;
+			
+			// Filter kedaluwarsa
+			let maxExpiryMinutes = 9999;
+			if (filters.maxExpiry === '< 1 Jam') maxExpiryMinutes = 60;
+			else if (filters.maxExpiry === '< 3 Jam') maxExpiryMinutes = 180;
+			else if (filters.maxExpiry === '< 6 Jam') maxExpiryMinutes = 360;
+			
+			const matchesExpiry =
+				filters.maxExpiry === 'Hari Ini' ||
+				parseExpiry(product.expiresIn) <= maxExpiryMinutes;
+
+			return matchesCategory && matchesSearch && matchesPrice && matchesDistance && matchesExpiry;
 		});
 
 		switch (sortBy) {
@@ -68,7 +90,7 @@ export function ProductGrid({
 		}
 
 		return result;
-	}, [selectedCategory, searchQuery, sortBy]);
+	}, [selectedCategory, searchQuery, sortBy, filters]);
 
 	return (
 		<div>

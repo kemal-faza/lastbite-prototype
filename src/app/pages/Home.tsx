@@ -7,11 +7,17 @@ import { ProductGrid } from '../components/ProductGrid';
 import { AIRecommendation } from '../components/AIRecommendation';
 import { FilterBar } from '../components/FilterBar';
 import type { SortOption } from '../components/FilterBar';
+import type { FilterValues } from '../components/FilterModal';
 
 export function Home() {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [sortBy, setSortBy] = useState<SortOption>('default');
+  const [filters, setFilters] = useState<FilterValues>({
+    maxDistance: 10,
+    maxPrice: 100000,
+    maxExpiry: 'Hari Ini'
+  });
 
   return (
     <div className="flex flex-col">
@@ -28,8 +34,18 @@ export function Home() {
         </div>
         <AIRecommendation />
         <CategoryFilter selected={selectedCategory} onSelect={setSelectedCategory} />
-        <FilterBar activeSort={sortBy} onSortChange={setSortBy} />
-        <ProductGrid selectedCategory={selectedCategory} searchQuery={searchQuery} sortBy={sortBy} />
+        <FilterBar 
+          activeSort={sortBy} 
+          onSortChange={setSortBy} 
+          filters={filters}
+          onFiltersChange={setFilters}
+        />
+        <ProductGrid 
+          selectedCategory={selectedCategory} 
+          searchQuery={searchQuery} 
+          sortBy={sortBy} 
+          filters={filters}
+        />
       </div>
     </div>
   );

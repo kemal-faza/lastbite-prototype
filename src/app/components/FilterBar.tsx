@@ -1,12 +1,15 @@
 import { ArrowUpDown, DollarSign, MapPin, Clock, SlidersHorizontal } from 'lucide-react';
 import { useState } from 'react';
 import { FilterModal } from './FilterModal';
+import type { FilterValues } from './FilterModal';
 
 export type SortOption = 'default' | 'price-asc' | 'price-desc' | 'distance-asc' | 'distance-desc' | 'expiry-asc';
 
 interface FilterBarProps {
   activeSort: SortOption;
   onSortChange: (option: SortOption) => void;
+  filters: FilterValues;
+  onFiltersChange: (filters: FilterValues) => void;
 }
 
 const sortOptions: { value: SortOption; label: string; icon: typeof DollarSign }[] = [
@@ -17,7 +20,7 @@ const sortOptions: { value: SortOption; label: string; icon: typeof DollarSign }
   { value: 'expiry-asc', label: 'Segera Habis', icon: Clock },
 ];
 
-export function FilterBar({ activeSort, onSortChange }: FilterBarProps) {
+export function FilterBar({ activeSort, onSortChange, filters, onFiltersChange }: FilterBarProps) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
 
   return (
@@ -71,6 +74,8 @@ export function FilterBar({ activeSort, onSortChange }: FilterBarProps) {
       <FilterModal 
         isOpen={isFilterOpen} 
         onClose={() => setIsFilterOpen(false)} 
+        filters={filters}
+        onApplyFilters={onFiltersChange}
       />
     </div>
   );

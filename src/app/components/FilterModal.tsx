@@ -2,14 +2,43 @@ import { X, SlidersHorizontal, MapPin, Wallet, Timer } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useState } from 'react';
 
+export interface FilterValues {
+  maxDistance: number;
+  maxPrice: number;
+  maxExpiry: string;
+}
+
 interface FilterModalProps {
   isOpen: boolean;
   onClose: () => void;
+  filters: FilterValues;
+  onApplyFilters: (filters: FilterValues) => void;
 }
 
-export function FilterModal({ isOpen, onClose }: FilterModalProps) {
-  const [priceRange, setPriceRange] = useState([0, 50000]);
-  const [distance, setDistance] = useState(2); // km
+export function FilterModal({ isOpen, onClose, filters, onApplyFilters }: FilterModalProps) {
+  const [priceRange, setPriceRange] = useState([0, filters.maxPrice]);
+  const [distance, setDistance] = useState(filters.maxDistance); // km
+  const [expiry, setExpiry] = useState(filters.maxExpiry);
+
+  const handleApply = () => {
+    onApplyFilters({
+      maxDistance: distance,
+      maxPrice: priceRange[1],
+      maxExpiry: expiry,
+    });
+    onClose();
+  };
+
+  const handleReset = () => {
+    setDistance(10);
+    setPriceRange([0, 100000]);
+    setExpiry('Hari Ini');
+    onApplyFilters({
+      maxDistance: 10,
+      maxPrice: 100000,
+      maxExpiry: 'Hari Ini',
+    });
+  };
 
   return (
     <AnimatePresence>
@@ -50,7 +79,9 @@ export function FilterModal({ isOpen, onClose }: FilterModalProps) {
                     <MapPin className="w-4 h-4 text-gray-400" />
                     Jarak Maksimal
                   </h4>
-                  <span className="text-[var(--primary)] font-bold">{distance} km</span>
+                  <span className="text-[var(--primary)] font-bold">
+                    {distance === 10 ? 'Semua Jarak' : `${distance} km`}
+                  </span>
                 </div>
                 <input 
                   type="range" 
@@ -64,7 +95,7 @@ export function FilterModal({ isOpen, onClose }: FilterModalProps) {
                 <div className="flex justify-between text-[10px] text-gray-400 font-medium">
                   <span>500m</span>
                   <span>5km</span>
-                  <span>10km</span>
+                  <span>Semua</span>
                 </div>
               </div>
               
@@ -75,7 +106,9 @@ export function FilterModal({ isOpen, onClose }: FilterModalProps) {
                     <Wallet className="w-4 h-4 text-gray-400" />
                     Harga Maksimal
                   </h4>
-                  <span className="text-[var(--primary)] font-bold">Rp {priceRange[1].toLocaleString('id-ID')}</span>
+                  <span className="text-[var(--primary)] font-bold">
+                    {priceRange[1] === 100000 ? 'Semua Harga' : `Rp ${priceRange[1].toLocaleString('id-ID')}`}
+                  </span>
                 </div>
                 <input 
                   type="range" 
@@ -89,7 +122,7 @@ export function FilterModal({ isOpen, onClose }: FilterModalProps) {
                 <div className="flex justify-between text-[10px] text-gray-400 font-medium">
                   <span>Rp 5rb</span>
                   <span>Rp 50rb</span>
-                  <span>Rp 100rb</span>
+                  <span>Semua</span>
                 </div>
               </div>
               
@@ -100,14 +133,22 @@ export function FilterModal({ isOpen, onClose }: FilterModalProps) {
                   Waktu Kedaluwarsa
                 </h4>
                 <div className="flex flex-wrap gap-2">
-                  {['< 1 Jam', '< 3 Jam', '< 6 Jam', 'Hari Ini'].map((tag) => (
-                    <button 
-                      key={tag}
-                      className="px-4 py-2 rounded-xl text-xs font-medium border border-gray-100 bg-gray-50 text-gray-600 hover:border-[var(--primary)]/30 hover:text-[var(--primary)] transition-all"
-                    >
-                      {tag}
-                    </button>
-                  ))}
+                  {['< 1 Jam', '< 3 Jam', '< 6 Jam', 'Hari Ini'].map((tag) => {
+                    const isSelected = expiry === tag;
+                    return (
+                      <button 
+                        key={tag}
+                        onClick={() => setExpiry(tag)}
+                        className={`px-4 py-2 rounded-xl text-xs font-medium border transition-all ${
+                          isSelected
+                            ? 'bg-[var(--primary)] border-[var(--primary)] text-white shadow-sm'
+                            : 'border-gray-100 bg-gray-50 text-gray-600 hover:border-[var(--primary)]/30 hover:text-[var(--primary)]'
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
@@ -115,13 +156,13 @@ export function FilterModal({ isOpen, onClose }: FilterModalProps) {
             <div className="p-4 bg-gray-50 border-t border-gray-100">
                <div className="flex gap-3">
                  <button 
-                  onClick={() => { setDistance(2); setPriceRange([0, 50000]); }}
+                  onClick={handleReset}
                   className="flex-1 py-3.5 text-sm font-bold text-gray-500 hover:text-gray-700"
                  >
                    Reset
                  </button>
                  <button 
-                  onClick={onClose}
+                  onClick={handleApply}
                   className="flex-[2] bg-[var(--primary)] text-white font-bold py-3.5 rounded-2xl shadow-lg shadow-[var(--primary)]/20 active:scale-[0.98] transition-all"
                  >
                    Terapkan Filter
