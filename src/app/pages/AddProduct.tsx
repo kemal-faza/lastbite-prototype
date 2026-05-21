@@ -21,6 +21,20 @@ export function AddProduct() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!productName || !quantity || !price) {
+      alert('Mohon isi nama produk, jumlah, dan harga!');
+      return;
+    }
+    const saved = JSON.parse(localStorage.getItem('lastbite-seller-products') || '[]');
+    saved.push({
+      id: Date.now(),
+      name: productName,
+      quantity: parseInt(quantity) || 0,
+      price: parseInt(price) || 0,
+      sold: 0,
+      notes: notes,
+    });
+    localStorage.setItem('lastbite-seller-products', JSON.stringify(saved));
     navigate('/seller');
   };
 
