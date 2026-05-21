@@ -25,6 +25,7 @@ export function Cart() {
 		removeItem,
 		updateQuantity,
 		clearCart,
+		currentStore,
 		itemCount,
 		subtotal,
 	} = useCart();
@@ -575,6 +576,11 @@ export function Cart() {
 								? 'Pembayaran'
 								: 'Konfirmasi'}
 					</h1>
+					{currentStore && checkoutStep === 1 && (
+						<p className="text-xs text-gray-500 ml-auto">
+							Pesanan dari <span className="font-semibold text-gray-700">{currentStore}</span>
+						</p>
+					)}
 				</div>
 				{renderStepIndicator()}
 			</div>
