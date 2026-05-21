@@ -2,6 +2,7 @@ import { useParams, useNavigate } from 'react-router';
 import {
 	ChevronLeft,
 	Clock,
+	Heart,
 	MapPin,
 	Star,
 	Check,
@@ -12,6 +13,7 @@ import { motion } from 'motion/react';
 import { products } from '../data/products';
 import { AIRecommendation } from '../components/AIRecommendation';
 import { useCart } from '../context/CartContext';
+import { useWishlist } from '../context/WishlistContext';
 import { QueueIndicator } from '../components/QueueIndicator';
 import { MapModal } from '../components/MapModal';
 import { useState } from 'react';
@@ -44,6 +46,8 @@ export function DetailProduct() {
       
 	const product = products.find((p) => p.id === Number(id));
 	const [isMapOpen, setIsMapOpen] = useState(false);
+	const { toggle, isWishlisted } = useWishlist();
+	const isFav = isWishlisted(product.id);
 
 	const cartItem = product ? items.find((item) => item.id === product.id) : undefined;
 	const isOutOfStock = product ? product.remaining <= 0 : true;
@@ -93,6 +97,15 @@ export function DetailProduct() {
 							{product.expiresIn}
 						</span>
 					</div>
+				<button
+					onClick={(e) => { e.stopPropagation(); toggle(product.id); }}
+					className="absolute bottom-3 left-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition-all z-10"
+					aria-label={isFav ? 'Hapus dari favorit' : 'Tambah ke favorit'}
+				>
+					<Heart
+						className={'w-4 h-4 ' + (isFav ? 'fill-red-500 text-red-500' : 'text-gray-600')}
+					/>
+				</button>
 				</div>
 
 				{/* Product info */}
