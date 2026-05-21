@@ -12,7 +12,10 @@ interface ProductGridProps {
 }
 
 function parseDistance(d: string): number {
-	return parseInt(d.replace(/\D/g, ''), 10) || 999;
+  const s = d.toLowerCase().replace(/[^0-9.]/g, '');
+  const num = parseFloat(s) || 0;
+  if (d.toLowerCase().includes('km')) return num * 1000;
+  return num || 999;
 }
 
 function parseExpiry(e: string): number {
