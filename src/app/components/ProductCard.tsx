@@ -30,9 +30,9 @@ export function ProductCard({ product }: ProductCardProps) {
       image: product.image,
     });
     setTimeout(() => {
-      navigate('/cart');
-    }, 600);
-  }, [product, addItem, navigate]);
+      setIsAdded(false);
+    }, 2000);
+  }, [product, addItem]);
 
   return (
     <motion.div

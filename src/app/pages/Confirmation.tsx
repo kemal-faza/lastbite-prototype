@@ -3,7 +3,7 @@ import { ChevronLeft, Check, Clock, MapPin, Navigation, ShoppingBag } from 'luci
 import { motion } from 'motion/react';
 import { QueueIndicator } from '../components/QueueIndicator';
 import { useOrders } from '../context/OrderContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 
 export function Confirmation() {
@@ -13,7 +13,27 @@ export function Confirmation() {
 	const [pickupCodeInput, setPickupCodeInput] = useState('');
 	const [pickupError, setPickupError] = useState('');
 	const [showSuccessScreen, setShowSuccessScreen] = useState(false);
+	const [timeLeft, setTimeLeft] = useState(30 * 60);
 
+	useEffect(() => {
+		if (timeLeft <= 0) return;
+		const timer = setInterval(() => {
+			setTimeLeft((prev) => {
+				if (prev <= 1) {
+					clearInterval(timer);
+					return 0;
+				}
+				return prev - 1;
+			});
+		}, 1000);
+		return () => clearInterval(timer);
+	}, [timeLeft]);
+
+	const formatTime = (s: number) => {
+		const m = Math.floor(s / 60);
+		const sec = s % 60;
+		return `${String(m).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+	};
 	const order = id ? getOrderById(id) : undefined;
 
 	const triggerConfetti = () => {
@@ -192,8 +212,8 @@ export function Confirmation() {
 							Selesaikan dalam
 						</span>
 					</div>
-					<p className="text-2xl font-bold text-[var(--destructive)] mt-1">
-						30:00
+					<p className={"text-2xl font-bold mt-1 " + (timeLeft <= 0 ? "text-gray-400" : "text-[var(--destructive)]")}>
+						{timeLeft <= 0 ? 'Waktu habis!' : formatTime(timeLeft)}
 					</p>
 				</div>
 				<QueueIndicator
