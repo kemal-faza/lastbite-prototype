@@ -44,8 +44,7 @@ export function Cart() {
 	);
 	const totalSaved = totalOriginal - subtotal;
 	const deliveryFee = 0;
-	const platformFee = subtotal > 0 ? 2000 : 0;
-	const total = subtotal + platformFee;
+  const total = subtotal;
 
 	const { addOrder } = useOrders();
 
@@ -267,9 +266,9 @@ export function Cart() {
 						<span>Subtotal ({itemCount} item)</span>
 						<span>Rp {subtotal.toLocaleString('id-ID')}</span>
 					</div>
-					<div className="flex justify-between text-gray-600">
-						<span>Biaya Layanan</span>
-						<span>Rp {platformFee.toLocaleString('id-ID')}</span>
+					<div className="flex justify-between text-green-600 text-xs">
+						<span>Gratis Biaya Layanan</span>
+						<span>(Ditanggung Mitra)</span>
 					</div>
 					<div className="pt-2.5 border-t border-gray-100 flex justify-between items-center font-semibold">
 						<span className="text-gray-900">Total Bayar</span>
@@ -398,9 +397,9 @@ export function Cart() {
 						<span>Subtotal</span>
 						<span>Rp {subtotal.toLocaleString('id-ID')}</span>
 					</div>
-					<div className="flex justify-between text-gray-600">
-						<span>Biaya Layanan</span>
-						<span>Rp {platformFee.toLocaleString('id-ID')}</span>
+					<div className="flex justify-between text-green-600 text-xs">
+						<span>Gratis Biaya Layanan</span>
+						<span>(Ditanggung Mitra)</span>
 					</div>
 					<div className="pt-2.5 border-t border-gray-100 flex justify-between items-center font-semibold text-sm text-gray-900">
 						<span>Total Bayar</span>
@@ -422,9 +421,9 @@ export function Cart() {
 						<span>Subtotal ({itemCount} item)</span>
 						<span>Rp {subtotal.toLocaleString('id-ID')}</span>
 					</div>
-					<div className="flex justify-between text-sm text-gray-600">
-						<span>Biaya Layanan</span>
-						<span>Rp {platformFee.toLocaleString('id-ID')}</span>
+					<div className="flex justify-between text-sm text-green-600">
+						<span>Gratis Biaya Layanan</span>
+						<span>(Ditanggung Mitra)</span>
 					</div>
 					<div className="pt-3 border-t border-gray-100 flex justify-between items-center">
 						<span className="font-bold text-gray-900">

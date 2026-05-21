@@ -53,6 +53,22 @@ export function SellerDashboard() {
             </div>
           </div>
         </section>
+			{/* Informasi Biaya Platform */}
+			<div className="bg-gradient-to-r from-green-50 to-teal-50 rounded-2xl p-4 border border-green-100">
+				<div className="flex items-start gap-3">
+					<div className="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center shrink-0">
+						<Store className="w-5 h-5 text-green-700" />
+					</div>
+					<div>
+						<h3 className="font-semibold text-gray-900 text-sm">Mitra LastBite</h3>
+						<p className="text-xs text-gray-600 mt-1 leading-relaxed">
+							Kamu tidak dikenakan biaya platform.
+							<br />Biaya layanan ditanggung sepenuhnya oleh LastBite
+							sebagai bentuk dukungan untuk mitra mengurangi food waste.
+						</p>
+					</div>
+				</div>
+			</div>
 
         {/* Produk Hari Ini */}
         <section>
