@@ -42,16 +42,19 @@ const reviews = [
 export function DetailProduct() {
 	const { id } = useParams();
 	const navigate = useNavigate();
-  const { items: cartItems, addItem, clearCart } = useCart();
-      
+	const { items: cartItems, addItem, clearCart } = useCart();
+
 	const product = products.find((p) => p.id === Number(id));
 	const [isMapOpen, setIsMapOpen] = useState(false);
 	const { toggle, isWishlisted } = useWishlist();
 	const isFav = isWishlisted(product.id);
 
-	const cartItem = product ? items.find((item) => item.id === product.id) : undefined;
+	const cartItem = product
+		? cartItems.find((item) => item.id === product.id)
+		: undefined;
 	const isOutOfStock = product ? product.remaining <= 0 : true;
-	const isCartFull = product && cartItem ? cartItem.quantity >= product.remaining : false;
+	const isCartFull =
+		product && cartItem ? cartItem.quantity >= product.remaining : false;
 	const cannotBuy = isOutOfStock || isCartFull;
 
 	if (!product) {
@@ -97,15 +100,24 @@ export function DetailProduct() {
 							{product.expiresIn}
 						</span>
 					</div>
-				<button
-					onClick={(e) => { e.stopPropagation(); toggle(product.id); }}
-					className="absolute bottom-3 left-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition-all z-10"
-					aria-label={isFav ? 'Hapus dari favorit' : 'Tambah ke favorit'}
-				>
-					<Heart
-						className={'w-4 h-4 ' + (isFav ? 'fill-red-500 text-red-500' : 'text-gray-600')}
-					/>
-				</button>
+					<button
+						onClick={(e) => {
+							e.stopPropagation();
+							toggle(product.id);
+						}}
+						className="absolute bottom-3 left-3 w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm flex items-center justify-center shadow-lg hover:bg-white transition-all z-10"
+						aria-label={
+							isFav ? 'Hapus dari favorit' : 'Tambah ke favorit'
+						}>
+						<Heart
+							className={
+								'w-4 h-4 ' +
+								(isFav
+									? 'fill-red-500 text-red-500'
+									: 'text-gray-600')
+							}
+						/>
+					</button>
 				</div>
 
 				{/* Product info */}
@@ -126,11 +138,17 @@ export function DetailProduct() {
 							{product.name}
 						</h2>
 						<div className="flex items-center gap-2 mt-1.5 flex-wrap text-xs text-gray-500">
-							<span className="font-semibold text-gray-700">{product.store}</span>
+							<span className="font-semibold text-gray-700">
+								{product.store}
+							</span>
 							<span>•</span>
-							<span className="bg-amber-50 text-amber-700 font-semibold px-1.5 py-0.5 rounded">★ 4.8 (12 ulasan)</span>
+							<span className="bg-amber-50 text-amber-700 font-semibold px-1.5 py-0.5 rounded">
+								★ 4.8 (12 ulasan)
+							</span>
 							<span>•</span>
-							<span className="text-green-600 font-medium">350+ diselamatkan</span>
+							<span className="text-green-600 font-medium">
+								350+ diselamatkan
+							</span>
 						</div>
 					</div>
 
@@ -175,10 +193,9 @@ export function DetailProduct() {
 							standar kebersihan terjaga. Hemat hingga{' '}
 							{product.discount}% dan bantu kurangi food waste!
 						</p>
-						<button 
+						<button
 							onClick={() => setIsMapOpen(true)}
-							className="mt-4 w-full flex items-center justify-center gap-2 py-2 border-2 border-gray-100 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
-						>
+							className="mt-4 w-full flex items-center justify-center gap-2 py-2 border-2 border-gray-100 rounded-xl text-sm font-semibold text-gray-600 hover:bg-gray-50 transition-colors">
 							<MapPin className="w-4 h-4" />
 							Lihat di Peta
 						</button>
@@ -240,8 +257,13 @@ export function DetailProduct() {
 								<ShieldCheck className="w-7 h-7 text-[var(--primary)]" />
 							</div>
 							<div>
-								<h4 className="text-sm font-bold text-gray-900">Terverifikasi LastBite</h4>
-								<p className="text-[10px] text-gray-500 leading-tight">Produk ini telah melewati verifikasi standar keamanan pangan harian kami.</p>
+								<h4 className="text-sm font-bold text-gray-900">
+									Terverifikasi LastBite
+								</h4>
+								<p className="text-[10px] text-gray-500 leading-tight">
+									Produk ini telah melewati verifikasi standar
+									keamanan pangan harian kami.
+								</p>
 							</div>
 						</div>
 					</div>
@@ -309,15 +331,29 @@ export function DetailProduct() {
 			<div className="fixed bottom-[72px] left-4 right-4 max-w-[calc(theme(maxWidth.md)-2rem)] mx-auto bg-white/95 backdrop-blur-md border border-gray-100 p-4 z-40 rounded-2xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)]">
 				<button
 					disabled={cannotBuy}
-									onClick={() => {
-										if (cartItems.length > 0 && cartItems[0].store !== product.store) {
-											const confirmed = window.confirm(
-												'Keranjangmu berisi item dari ' + cartItems[0].store + '. Hapus dan ganti?'
-											);
-											if (!confirmed) return;
-											clearCart();
-										}
-										addItem({ id: product.id, name: product.name, store: product.store, price: product.discountedPrice, originalPrice: product.originalPrice, image: product.image }); navigate('/cart'); }}
+					onClick={() => {
+						if (
+							cartItems.length > 0 &&
+							cartItems[0].store !== product.store
+						) {
+							const confirmed = window.confirm(
+								'Keranjangmu berisi item dari ' +
+									cartItems[0].store +
+									'. Hapus dan ganti?',
+							);
+							if (!confirmed) return;
+							clearCart();
+						}
+						addItem({
+							id: product.id,
+							name: product.name,
+							store: product.store,
+							price: product.discountedPrice,
+							originalPrice: product.originalPrice,
+							image: product.image,
+						});
+						navigate('/cart');
+					}}
 					className={
 						'w-full font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all ' +
 						(cannotBuy
@@ -325,17 +361,21 @@ export function DetailProduct() {
 							: 'bg-[var(--primary)] text-white hover:bg-[var(--primary)]/90 active:scale-[0.98]')
 					}>
 					<ShoppingBag className="w-5 h-5" />
-					{isOutOfStock ? 'Stok Habis' : isCartFull ? 'Stok di Keranjang Penuh' : 'Beli'}
+					{isOutOfStock
+						? 'Stok Habis'
+						: isCartFull
+							? 'Stok di Keranjang Penuh'
+							: 'Beli'}
 				</button>
 				<p className="text-center text-gray-400 text-xs mt-1.5">
 					Lanjut ke keranjang untuk checkout
 				</p>
 			</div>
-			
-			<MapModal 
-				isOpen={isMapOpen} 
-				onClose={() => setIsMapOpen(false)} 
-				storeName={product.store} 
+
+			<MapModal
+				isOpen={isMapOpen}
+				onClose={() => setIsMapOpen(false)}
+				storeName={product.store}
 			/>
 		</div>
 	);
