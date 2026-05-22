@@ -25,6 +25,7 @@ export function Cart() {
 		removeItem,
 		updateQuantity,
 		clearCart,
+		currentStore,
 		itemCount,
 		subtotal,
 	} = useCart();
@@ -54,31 +55,31 @@ export function Cart() {
 		isSubmittingRef.current = true;
 		setIsSubmitting(true);
 		try {
-			addOrder(
-				{
-					items: items.map((i) => ({
-						id: i.id,
-						name: i.name,
-						store: i.store,
-						price: i.price,
-						quantity: i.quantity,
-						image: i.image,
-					})),
-					total,
-					paymentMethod: 'cod',
-					name: paymentInfo.name,
-					phone: paymentInfo.phone,
-				},
-				{
-					requestId:
-						typeof crypto !== 'undefined' &&
-						typeof crypto.randomUUID === 'function'
-							? crypto.randomUUID()
-							: 'req-' + Date.now(),
-				},
-			);
-			clearCart();
-			navigate('/orders');
+      const orderId = addOrder(
+        {
+          items: items.map((i) => ({
+            id: i.id,
+            name: i.name,
+            store: i.store,
+            price: i.price,
+            quantity: i.quantity,
+            image: i.image,
+          })),
+          total,
+          paymentMethod: 'cod',
+          name: paymentInfo.name,
+          phone: paymentInfo.phone,
+        },
+        {
+          requestId:
+            typeof crypto !== 'undefined' &&
+            typeof crypto.randomUUID === 'function'
+              ? crypto.randomUUID()
+              : 'req-' + Date.now(),
+        },
+      );
+      clearCart();
+      navigate('/order/confirm/' + orderId);
 		} finally {
 			isSubmittingRef.current = false;
 			setIsSubmitting(false);
@@ -575,6 +576,11 @@ export function Cart() {
 								? 'Pembayaran'
 								: 'Konfirmasi'}
 					</h1>
+					{currentStore && checkoutStep === 1 && (
+						<p className="text-xs text-gray-500 ml-auto">
+							Pesanan dari <span className="font-semibold text-gray-700">{currentStore}</span>
+						</p>
+					)}
 				</div>
 				{renderStepIndicator()}
 			</div>

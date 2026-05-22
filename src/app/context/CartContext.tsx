@@ -69,8 +69,8 @@ const CartContext = createContext<{
   clearCart: () => void;
   itemCount: number;
   subtotal: number;
+  currentStore: string | null;
 } | null>(null);
-
 export function CartProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(cartReducer, { items: [] });
 
@@ -87,6 +87,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
   const itemCount = state.items.reduce((sum, i) => sum + i.quantity, 0);
   const subtotal = state.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
+  const currentStore = state.items.length > 0 ? state.items[0].store : null;
 
   return (
     <CartContext.Provider
@@ -98,8 +99,8 @@ export function CartProvider({ children }: { children: ReactNode }) {
         clearCart,
         itemCount,
         subtotal,
-      }}
-    >
+        currentStore,
+      }}>
       {children}
     </CartContext.Provider>
   );

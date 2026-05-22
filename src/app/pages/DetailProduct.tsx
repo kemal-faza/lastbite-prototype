@@ -42,7 +42,7 @@ const reviews = [
 export function DetailProduct() {
 	const { id } = useParams();
 	const navigate = useNavigate();
-  const { items, addItem } = useCart();
+  const { items: cartItems, addItem, clearCart } = useCart();
       
 	const product = products.find((p) => p.id === Number(id));
 	const [isMapOpen, setIsMapOpen] = useState(false);
@@ -309,7 +309,15 @@ export function DetailProduct() {
 			<div className="fixed bottom-[72px] left-4 right-4 max-w-[calc(theme(maxWidth.md)-2rem)] mx-auto bg-white/95 backdrop-blur-md border border-gray-100 p-4 z-40 rounded-2xl shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)]">
 				<button
 					disabled={cannotBuy}
-					onClick={() => { addItem({ id: product.id, name: product.name, store: product.store, price: product.discountedPrice, originalPrice: product.originalPrice, image: product.image }); navigate('/cart'); }}
+									onClick={() => {
+										if (cartItems.length > 0 && cartItems[0].store !== product.store) {
+											const confirmed = window.confirm(
+												'Keranjangmu berisi item dari ' + cartItems[0].store + '. Hapus dan ganti?'
+											);
+											if (!confirmed) return;
+											clearCart();
+										}
+										addItem({ id: product.id, name: product.name, store: product.store, price: product.discountedPrice, originalPrice: product.originalPrice, image: product.image }); navigate('/cart'); }}
 					className={
 						'w-full font-semibold py-3.5 rounded-2xl flex items-center justify-center gap-2 transition-all ' +
 						(cannotBuy

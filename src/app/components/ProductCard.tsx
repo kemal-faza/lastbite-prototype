@@ -14,12 +14,21 @@ export function ProductCard({ product }: ProductCardProps) {
   const [isAdded, setIsAdded] = useState(false);
   const [imgError, setImgError] = useState(false);
   const navigate = useNavigate();
-  const { addItem } = useCart();
+  const { items: cartItems, addItem, clearCart } = useCart();
   const { toggle, isWishlisted } = useWishlist();
   const isFav = isWishlisted(product.id);
 
   const handleAddToCart = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
+
+    if (cartItems.length > 0 && cartItems[0].store !== product.store) {
+      const confirmed = window.confirm(
+        'Keranjangmu berisi item dari ' + cartItems[0].store + '. Hapus dan ganti dengan item dari ' + product.store + '?'
+      );
+      if (!confirmed) return;
+      clearCart();
+    }
+
     setIsAdded(true);
     addItem({
       id: product.id,
@@ -30,9 +39,9 @@ export function ProductCard({ product }: ProductCardProps) {
       image: product.image,
     });
     setTimeout(() => {
-      navigate('/cart');
-    }, 600);
-  }, [product, addItem, navigate]);
+      setIsAdded(false);
+    }, 2000);
+  }, [product, addItem, cartItems, clearCart]);
 
   return (
     <motion.div

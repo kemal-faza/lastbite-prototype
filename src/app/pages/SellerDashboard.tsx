@@ -1,5 +1,6 @@
 import { ArrowLeft, Store, Package, Plus } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { useState, useEffect } from 'react';
 
 const todayProducts = [
   { id: 1, name: 'Roti Coklat', quantity: 8, price: 3000, sold: 5 },
@@ -9,9 +10,24 @@ const todayProducts = [
 
 export function SellerDashboard() {
   const navigate = useNavigate();
+  const [products, setProducts] = useState(todayProducts);
 
-  const totalStock = todayProducts.reduce((sum, p) => sum + p.quantity, 0);
-  const totalSold = todayProducts.reduce((sum, p) => sum + p.sold, 0);
+  useEffect(() => {
+    const saved = localStorage.getItem('lastbite-seller-products');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setProducts([...todayProducts, ...parsed]);
+        }
+      } catch (e) {
+        console.error('Gagal muat produk tersimpan', e);
+      }
+    }
+  }, []);
+
+  const totalStock = products.reduce((sum, p) => sum + p.quantity, 0);
+  const totalSold = products.reduce((sum, p) => sum + p.sold, 0);
   const remaining = totalStock - totalSold;
 
   return (
@@ -76,7 +92,7 @@ export function SellerDashboard() {
             Produk Hari Ini
           </h2>
           <div className="space-y-3">
-            {todayProducts.map((product) => (
+            {products.map((product) => (
               <div
                 key={product.id}
                 className="bg-white rounded-2xl shadow-sm px-4 py-4"
@@ -115,7 +131,10 @@ export function SellerDashboard() {
                       </span>
                     </span>
                   </div>
-                  <button className="text-xs font-medium text-[var(--primary)] hover:underline">
+                  <button
+                    onClick={() => navigate('/product/' + product.id)}
+                    className="text-xs font-medium text-[var(--primary)] hover:underline"
+                  >
                     Lihat Detail
                   </button>
                 </div>
