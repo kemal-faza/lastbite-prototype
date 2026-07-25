@@ -12,6 +12,8 @@ import {
 import { motion } from 'motion/react';
 import { products } from '../data/products';
 import { AIRecommendation } from '../components/AIRecommendation';
+import { getSellerProducts } from '../data/sellerProducts';
+import { sellerProductToProduct } from '../components/ProductGrid';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { QueueIndicator } from '../components/QueueIndicator';
@@ -44,7 +46,13 @@ export function DetailProduct() {
 	const navigate = useNavigate();
 	const { items: cartItems, addItem, clearCart } = useCart();
 
-	const product = products.find((p) => p.id === Number(id));
+	const isSellerProduct = id?.startsWith('seller-');
+	const product = isSellerProduct
+		? (() => {
+				const seller = getSellerProducts().find((sp) => sp.id === id);
+				return seller ? sellerProductToProduct(seller) : undefined;
+			})()
+		: products.find((p) => p.id === Number(id));
 	const [isMapOpen, setIsMapOpen] = useState(false);
 	const { toggle, isWishlisted } = useWishlist();
 	const isFav = isWishlisted(product.id);

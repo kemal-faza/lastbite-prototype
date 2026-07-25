@@ -1,8 +1,27 @@
 import { useMemo } from 'react';
 import { ProductCard } from './ProductCard';
-import { products } from '../data/products';
+import { products, type Product } from '../data/products';
+import { getSellerProducts, type SellerProduct } from '../data/sellerProducts';
 import type { SortOption } from './FilterBar';
 import type { FilterValues } from './FilterModal';
+
+/** Convert SellerProduct → Product-compatible shape for buyer-facing components */
+export function sellerProductToProduct(seller: SellerProduct): Product & { id: any } {
+  const originalPrice = seller.originalPrice || seller.price * 2;
+  return {
+    id: seller.id, // string id — cast to any for prototype compatibility
+    name: seller.name,
+    store: seller.store,
+    originalPrice,
+    discountedPrice: seller.price,
+    discount: originalPrice > 0 ? Math.round((1 - seller.price / originalPrice) * 100) : 0,
+    expiresIn: '6 jam',
+    remaining: seller.quantity,
+    distance: '1km',
+    category: seller.category,
+    image: seller.image || '',
+  };
+}
 
 interface ProductGridProps {
 	selectedCategory: string;
@@ -32,7 +51,13 @@ export function ProductGrid({
 	filters,
 }: ProductGridProps) {
 	const filteredProducts = useMemo(() => {
-		let result = products.filter((product) => {
+		const allProducts = [
+			...products,
+			...getSellerProducts()
+				.filter((sp) => sp.active)
+				.map(sellerProductToProduct),
+		];
+		let result = allProducts.filter((product) => {
 			const matchesCategory =
 				selectedCategory === 'all' ||
 				product.category === selectedCategory;

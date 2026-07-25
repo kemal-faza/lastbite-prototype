@@ -1,0 +1,49 @@
+import { describe, it, expect } from 'vitest';
+import { sellerProductToProduct } from '../ProductGrid';
+import type { SellerProduct } from '../../data/sellerProducts';
+
+describe('sellerProductToProduct', () => {
+  it('converts seller product to product-compatible shape', () => {
+    const seller: SellerProduct = {
+      id: 'seller-abc',
+      name: 'Roti Baru',
+      store: 'Test Store',
+      quantity: 10,
+      price: 5000,
+      originalPrice: 10000,
+      category: 'bakery',
+      image: '',
+      active: true,
+      createdAt: Date.now(),
+    };
+    const product = sellerProductToProduct(seller);
+    expect(product.id).toBe('seller-abc');
+    expect(product.name).toBe('Roti Baru');
+    expect(product.store).toBe('Test Store');
+    expect(product.discountedPrice).toBe(5000);
+    expect(product.originalPrice).toBe(10000);
+    expect(product.discount).toBe(50);
+    expect(product.remaining).toBe(10);
+    expect(product.expiresIn).toBe('6 jam');
+    expect(product.distance).toBe('1km');
+    expect(product.category).toBe('bakery');
+    expect(product.image).toBe('');
+  });
+
+  it('handles edge case: originalPrice=0 (avoids division by zero)', () => {
+    const seller: SellerProduct = {
+      id: 'seller-xyz',
+      name: 'Free',
+      store: 'X',
+      quantity: 1,
+      price: 0,
+      originalPrice: 0,
+      category: 'meals',
+      image: '',
+      active: true,
+      createdAt: 0,
+    };
+    const product = sellerProductToProduct(seller);
+    expect(product.discount).toBe(0);
+  });
+});
