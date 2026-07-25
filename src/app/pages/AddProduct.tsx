@@ -3,38 +3,41 @@ import { ArrowLeft, Camera } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
+import { addSellerProduct } from '../data/sellerProducts';
 
-const menuOptions = [
-  'Pilih menu',
-  'Roti Coklat',
-  'Roti Keju',
-  'Roti Pisang',
-  'Ayam Geprek',
-];
+const CATEGORIES = [
+  { value: '', label: 'Pilih kategori', disabled: true },
+  { value: 'meals', label: 'Makanan Berat' },
+  { value: 'bakery', label: 'Roti & Kue' },
+  { value: 'drinks', label: 'Minuman' },
+  { value: 'snacks', label: 'Cemilan' },
+] as const;
 
 export function AddProduct() {
   const navigate = useNavigate();
   const [productName, setProductName] = useState('');
+  const [category, setCategory] = useState('');
   const [quantity, setQuantity] = useState('');
   const [price, setPrice] = useState('');
+  const [originalPrice, setOriginalPrice] = useState('');
   const [notes, setNotes] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!productName || !quantity || !price) {
-      alert('Mohon isi nama produk, jumlah, dan harga!');
+    if (!productName || !category || !quantity || !price) {
+      alert('Mohon isi nama produk, kategori, jumlah, dan harga!');
       return;
     }
-    const saved = JSON.parse(localStorage.getItem('lastbite-seller-products') || '[]');
-    saved.push({
-      id: Date.now(),
+    addSellerProduct({
       name: productName,
+      store: 'Toko Anda',
       quantity: parseInt(quantity) || 0,
       price: parseInt(price) || 0,
-      sold: 0,
-      notes: notes,
+      originalPrice:
+        parseInt(originalPrice) || parseInt(price) * 2 || 0,
+      category: category as 'meals' | 'bakery' | 'drinks' | 'snacks',
+      notes: notes || undefined,
     });
-    localStorage.setItem('lastbite-seller-products', JSON.stringify(saved));
     navigate('/seller');
   };
 
@@ -58,17 +61,32 @@ export function AddProduct() {
         <form onSubmit={handleSubmit} className="space-y-5">
           {/* Nama Produk */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label htmlFor="productName" className="text-sm font-medium text-gray-700">
               Nama Produk <span className="text-[var(--destructive)]">*</span>
             </label>
-            <select
+            <Input
+              id="productName"
+              type="text"
+              placeholder="Contoh: Roti Coklat"
               value={productName}
               onChange={(e) => setProductName(e.target.value)}
+            />
+          </div>
+
+          {/* Kategori */}
+          <div className="space-y-2">
+            <label htmlFor="category" className="text-sm font-medium text-gray-700">
+              Kategori <span className="text-[var(--destructive)]">*</span>
+            </label>
+            <select
+              id="category"
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
               className="flex h-9 w-full min-w-0 rounded-md border border-input bg-input-background px-3 py-1 text-base transition-[color,box-shadow] outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] md:text-sm"
             >
-              {menuOptions.map((opt) => (
-                <option key={opt} value={opt === 'Pilih menu' ? '' : opt} disabled={opt === 'Pilih menu'}>
-                  {opt}
+              {CATEGORIES.map((opt) => (
+                <option key={opt.value} value={opt.value} disabled={opt.disabled}>
+                  {opt.label}
                 </option>
               ))}
             </select>
@@ -76,10 +94,11 @@ export function AddProduct() {
 
           {/* Jumlah Sisa */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label htmlFor="quantity" className="text-sm font-medium text-gray-700">
               Jumlah Sisa <span className="text-[var(--destructive)]">*</span>
             </label>
             <Input
+              id="quantity"
               type="number"
               placeholder="8"
               value={quantity}
@@ -90,7 +109,7 @@ export function AddProduct() {
 
           {/* Harga Diskon */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label htmlFor="price" className="text-sm font-medium text-gray-700">
               Harga Diskon (per pcs) <span className="text-[var(--destructive)]">*</span>
             </label>
             <div className="relative">
@@ -98,6 +117,7 @@ export function AddProduct() {
                 Rp
               </span>
               <Input
+                id="price"
                 type="number"
                 placeholder="3.000"
                 value={price}
@@ -108,10 +128,37 @@ export function AddProduct() {
             </div>
           </div>
 
+          {/* Harga Normal (opsional) */}
+          <div className="space-y-2">
+            <label htmlFor="originalPrice" className="text-sm font-medium text-gray-700">
+              Harga Normal (per pcs) <span className="text-gray-400 font-normal">— opsional</span>
+            </label>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-gray-500 font-medium">
+                Rp
+              </span>
+              <Input
+                id="originalPrice"
+                type="number"
+                placeholder={price ? `Auto: ${parseInt(price) * 2}` : '7.500'}
+                value={originalPrice}
+                onChange={(e) => setOriginalPrice(e.target.value)}
+                className="pl-10"
+                min="0"
+              />
+            </div>
+            <p className="text-xs text-gray-400">
+              Kosongkan untuk auto 2× harga diskon
+            </p>
+          </div>
+
           {/* Catatan */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Catatan</label>
+            <label htmlFor="notes" className="text-sm font-medium text-gray-700">
+              Catatan
+            </label>
             <Textarea
+              id="notes"
               placeholder="Tanpa bahan pengawet, dipanggang pagi ini"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
@@ -119,12 +166,14 @@ export function AddProduct() {
             />
           </div>
 
-          {/* Upload Foto */}
+          {/* Upload Foto — placeholder */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">Upload Foto</label>
-            <div className="border-2 border-dashed border-gray-300 rounded-2xl px-4 py-8 flex flex-col items-center justify-center text-gray-400 cursor-pointer hover:border-gray-400 transition-colors">
+            <label className="text-sm font-medium text-gray-700">
+              Foto Produk
+            </label>
+            <div className="border-2 border-dashed border-gray-300 rounded-2xl px-4 py-8 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
               <Camera className="w-8 h-8 mb-2" />
-              <span className="text-sm">Ketuk untuk mengunggah foto</span>
+              <span className="text-sm">Foto placeholder akan digunakan</span>
             </div>
           </div>
 
