@@ -14,8 +14,20 @@ beforeEach(() => {
 });
 
 describe('getSellerProducts', () => {
-  it('returns empty array when localStorage is empty', () => {
-    expect(getSellerProducts()).toEqual([]);
+  it('seeds 4 demo products when localStorage is empty', () => {
+    const products = getSellerProducts();
+    expect(products).toHaveLength(4);
+    expect(products[0].name).toBe('Roti Coklat');
+    expect(products[0].id).toBe('seed-1');
+    expect(products[0].active).toBe(true);
+    expect(products[3].name).toBe('Dimsum Ayam');
+    expect(products[3].active).toBe(false); // demo inactive product
+  });
+
+  it('does NOT re-seed when products already exist', () => {
+    getSellerProducts(); // seeds
+    const products = getSellerProducts();
+    expect(products).toHaveLength(4); // still 4, not doubled
   });
 
   it('returns empty array when localStorage has invalid JSON (corrupt)', () => {
@@ -24,7 +36,7 @@ describe('getSellerProducts', () => {
     expect(getSellerProducts()).toEqual([]);
   });
 
-  it('returns parsed products from localStorage', () => {
+  it('returns parsed products from localStorage (skips seed)', () => {
     const mock: SellerProduct[] = [
       {
         id: 'seller-123',
@@ -41,11 +53,12 @@ describe('getSellerProducts', () => {
     ];
     localStorage.setItem(STORAGE_KEY, JSON.stringify(mock));
     expect(getSellerProducts()).toEqual(mock);
+    expect(getSellerProducts()).toHaveLength(1); // not 4 seed
   });
 });
 
 describe('addSellerProduct', () => {
-  it('adds product with generated id and defaults', () => {
+  it('adds product with generated id alongside seed products', () => {
     const input = {
       name: 'Roti Baru',
       store: 'Test Store',
@@ -57,14 +70,16 @@ describe('addSellerProduct', () => {
     };
     addSellerProduct(input);
     const products = getSellerProducts();
-    expect(products).toHaveLength(1);
-    expect(products[0].id).toMatch(/^seller-\d+-\d+$/);
-    expect(products[0].name).toBe('Roti Baru');
-    expect(products[0].image).toBe('');
-    expect(products[0].active).toBe(true);
+    // 4 seed + 1 new = 5 total
+    expect(products).toHaveLength(5);
+    const added = products.find((p) => p.id.startsWith('seller-'));
+    expect(added).toBeDefined();
+    expect(added!.name).toBe('Roti Baru');
+    expect(added!.image).toBe('');
+    expect(added!.active).toBe(true);
   });
 
-  it('appends to existing products', () => {
+  it('appends to existing products (including seed)', () => {
     addSellerProduct({
       name: 'A',
       store: 'X',
@@ -81,9 +96,15 @@ describe('addSellerProduct', () => {
       originalPrice: 400,
       category: 'drinks',
     });
-    expect(getSellerProducts()).toHaveLength(2);
+    // 4 seed + 2 new = 6
+    expect(getSellerProducts()).toHaveLength(6);
   });
 });
+
+// Helper: find first non-seed product (user-added)
+function firstUserProduct(): SellerProduct | undefined {
+  return getSellerProducts().find((p) => p.id.startsWith('seller-'));
+}
 
 describe('updateSellerProduct', () => {
   it('updates specific fields of an existing product', () => {
@@ -95,22 +116,24 @@ describe('updateSellerProduct', () => {
       originalPrice: 200,
       category: 'meals',
     });
-    const before = getSellerProducts();
-    updateSellerProduct(before[0].id, { name: 'New', quantity: 10 });
+    const added = firstUserProduct()!;
+    updateSellerProduct(added.id, { name: 'New', quantity: 10 });
     const after = getSellerProducts();
-    expect(after[0].name).toBe('New');
-    expect(after[0].quantity).toBe(10);
-    expect(after[0].price).toBe(100); // unchanged
+    const updated = after.find((p) => p.id === added.id);
+    expect(updated!.name).toBe('New');
+    expect(updated!.quantity).toBe(10);
+    expect(updated!.price).toBe(100); // unchanged
   });
 
   it('does nothing if product not found', () => {
     updateSellerProduct('nonexistent', { name: 'X' });
-    expect(getSellerProducts()).toEqual([]);
+    // Seed products still present, not wiped
+    expect(getSellerProducts().length).toBeGreaterThan(0);
   });
 });
 
 describe('deleteSellerProduct', () => {
-  it('removes product by id', () => {
+  it('removes user-added product by id (keeps seed)', () => {
     addSellerProduct({
       name: 'A',
       store: 'X',
@@ -127,20 +150,27 @@ describe('deleteSellerProduct', () => {
       originalPrice: 200,
       category: 'meals',
     });
-    const products = getSellerProducts();
-    deleteSellerProduct(products[0].id);
-    expect(getSellerProducts()).toHaveLength(1);
-    expect(getSellerProducts()[0].name).toBe('B');
+    const addedA = firstUserProduct()!;
+    deleteSellerProduct(addedA.id);
+    // 4 seed + 1 remaining user product = 5
+    expect(getSellerProducts()).toHaveLength(5);
+  });
+
+  it('can delete seed products too', () => {
+    const seed = getSellerProducts(); // seeds
+    deleteSellerProduct(seed[0].id);
+    expect(getSellerProducts()).toHaveLength(3);
   });
 
   it('does nothing if id not found', () => {
     deleteSellerProduct('nonexistent');
-    expect(getSellerProducts()).toEqual([]);
+    // Seed products preserved
+    expect(getSellerProducts().length).toBeGreaterThan(0);
   });
 });
 
 describe('toggleProductActive', () => {
-  it('flips active from true to false', () => {
+  it('flips active from true to false on user product', () => {
     addSellerProduct({
       name: 'A',
       store: 'X',
@@ -149,10 +179,11 @@ describe('toggleProductActive', () => {
       originalPrice: 200,
       category: 'meals',
     });
-    const id = getSellerProducts()[0].id;
-    expect(getSellerProducts()[0].active).toBe(true);
-    toggleProductActive(id);
-    expect(getSellerProducts()[0].active).toBe(false);
+    const added = firstUserProduct()!;
+    expect(added.active).toBe(true);
+    toggleProductActive(added.id);
+    const toggled = getSellerProducts().find((p) => p.id === added.id);
+    expect(toggled!.active).toBe(false);
   });
 
   it('flips active from false to true', () => {
@@ -164,9 +195,10 @@ describe('toggleProductActive', () => {
       originalPrice: 200,
       category: 'meals',
     });
-    const id = getSellerProducts()[0].id;
-    toggleProductActive(id);
-    toggleProductActive(id);
-    expect(getSellerProducts()[0].active).toBe(true);
+    const added = firstUserProduct()!;
+    toggleProductActive(added.id); // true → false
+    toggleProductActive(added.id); // false → true
+    const toggled = getSellerProducts().find((p) => p.id === added.id);
+    expect(toggled!.active).toBe(true);
   });
 });
