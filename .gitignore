@@ -37,3 +37,9 @@ npm-debug.log*
 .code-review-graph
 .antigravitycli
 *.txt
+DESIGN.md
+*handoff*.*
+docs/
+.codegraph/
+guidelines/
+CONTEXT.md
