@@ -1,10 +1,11 @@
-import { Package, Soup, Croissant, Coffee } from 'lucide-react';
+import { Package, Soup, Croissant, Coffee, Candy } from 'lucide-react';
 
 
 const categories = [
   { id: 'all', label: 'Semua', icon: Package },
   { id: 'meals', label: 'Makanan', icon: Soup },
   { id: 'bakery', label: 'Roti', icon: Croissant },
+  { id: 'snacks', label: 'Cemilan', icon: Candy },
   { id: 'drinks', label: 'Minuman', icon: Coffee },
 ];
 
