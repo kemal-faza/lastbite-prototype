@@ -18,6 +18,9 @@ export interface SellerProduct {
   image: string;
   active: boolean;
   createdAt: number;
+  /** Optional display metadata inherited from the seed catalog */
+  expiresIn?: string;
+  distance?: string;
 }
 
 function readAll(): SellerProduct[] {
@@ -28,7 +31,6 @@ function readAll(): SellerProduct[] {
       const seeded: SellerProduct[] = SEED_DATA.map((p, i) => ({
         ...p,
         id: `seed-${i + 1}`,
-        image: '',
         notes: undefined,
         createdAt: Date.now(),
       }));
@@ -48,15 +50,33 @@ function writeAll(products: SellerProduct[]): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
 }
 
-const SEED_DATA: Array<{
-  name: string;
-  store: string;
-  quantity: number;
-  price: number;
-  originalPrice: number;
-  category: SellerProduct['category'];
-  active: boolean;
-}> = [
+type SeedProduct = Omit<SellerProduct, 'id' | 'notes' | 'createdAt'>;
+
+const SEED_DATA: SeedProduct[] = [
+  {
+    name: 'Ayam Preksu',
+    store: 'Preksu Geprek',
+    quantity: 5,
+    price: 8000,
+    originalPrice: 16000,
+    category: 'meals',
+    image: '/assets/products/ayam_geprek.png',
+    active: true,
+    expiresIn: '2 jam',
+    distance: '120m',
+  },
+  {
+    name: 'Nasi Padang',
+    store: 'RM Sederhana',
+    quantity: 3,
+    price: 10000,
+    originalPrice: 18000,
+    category: 'meals',
+    image: '/assets/products/nasi_padang.png',
+    active: true,
+    expiresIn: '1 jam',
+    distance: '200m',
+  },
   {
     name: 'Roti Coklat',
     store: 'Roti Ibu Tutik',
@@ -64,7 +84,22 @@ const SEED_DATA: Array<{
     price: 3000,
     originalPrice: 7500,
     category: 'bakery',
+    image: '/assets/products/bakery_surplus.png',
     active: true,
+    expiresIn: '4 jam',
+    distance: '650m',
+  },
+  {
+    name: 'Kopi Susu Gula Aren',
+    store: 'Kopiku',
+    quantity: 10,
+    price: 8000,
+    originalPrice: 15000,
+    category: 'drinks',
+    image: '/assets/products/kopi_susu.png',
+    active: true,
+    expiresIn: '3 jam',
+    distance: '150m',
   },
   {
     name: 'Nasi Goreng Kampung',
@@ -73,7 +108,22 @@ const SEED_DATA: Array<{
     price: 12000,
     originalPrice: 20000,
     category: 'meals',
+    image: '/assets/products/nasi_goreng.png',
     active: true,
+    expiresIn: '2 jam',
+    distance: '720m',
+  },
+  {
+    name: 'Roti Keju',
+    store: 'Roti Ibu Tutik',
+    quantity: 6,
+    price: 3500,
+    originalPrice: 8000,
+    category: 'bakery',
+    image: 'https://images.unsplash.com/photo-1751199592465-f142293a8cc6?w=400&h=300&fit=crop',
+    active: true,
+    expiresIn: '5 jam',
+    distance: '1.2km',
   },
   {
     name: 'Es Teh Tarik',
@@ -82,16 +132,118 @@ const SEED_DATA: Array<{
     price: 5000,
     originalPrice: 10000,
     category: 'drinks',
+    image: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=400&h=300&fit=crop',
     active: true,
+    expiresIn: '2 jam',
+    distance: '100m',
+  },
+  {
+    name: 'Mie Ayam Komplit',
+    store: 'Mie Ayam Pakde',
+    quantity: 2,
+    price: 10000,
+    originalPrice: 15000,
+    category: 'meals',
+    image: '/assets/products/mie_ayam.png',
+    active: true,
+    expiresIn: '1 jam',
+    distance: '850m',
+  },
+  {
+    name: 'Pisang Goreng Kriuk',
+    store: 'Warung Bu Ani',
+    quantity: 6,
+    price: 5000,
+    originalPrice: 10000,
+    category: 'snacks',
+    image: 'https://images.unsplash.com/photo-1540714605746-4f474eefc6d4?w=400&h=300&fit=crop',
+    active: true,
+    expiresIn: '1 jam',
+    distance: '300m',
+  },
+  {
+    name: 'Nasi Kuning Komplit',
+    store: 'Warung Bu Ani',
+    quantity: 4,
+    price: 10000,
+    originalPrice: 18000,
+    category: 'meals',
+    image: 'https://images.unsplash.com/photo-1608925896944-6863dd0b8630?w=400&h=300&fit=crop',
+    active: true,
+    expiresIn: '2 jam',
+    distance: '720m',
+  },
+  {
+    name: 'Kopi Hitam',
+    store: 'Kopiku',
+    quantity: 10,
+    price: 4000,
+    originalPrice: 8000,
+    category: 'drinks',
+    image: 'https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=400&h=300&fit=crop',
+    active: true,
+    expiresIn: '3 jam',
+    distance: '150m',
+  },
+  {
+    name: 'Matcha Latte',
+    store: 'Kopiku',
+    quantity: 5,
+    price: 10000,
+    originalPrice: 18000,
+    category: 'drinks',
+    image: 'https://images.unsplash.com/photo-1536256263959-770b48d82b0a?w=400&h=300&fit=crop',
+    active: true,
+    expiresIn: '3 jam',
+    distance: '150m',
   },
   {
     name: 'Dimsum Ayam',
     store: 'Preksu Geprek',
-    quantity: 5,
+    quantity: 7,
     price: 8000,
     originalPrice: 15000,
     category: 'snacks',
+    image: 'https://images.unsplash.com/photo-1756367201317-3d1494092529?w=400&h=300&fit=crop',
     active: false,
+    expiresIn: '2 jam',
+    distance: '120m',
+  },
+  {
+    name: 'Sate Padang',
+    store: 'RM Sederhana',
+    quantity: 3,
+    price: 12000,
+    originalPrice: 20000,
+    category: 'meals',
+    image: 'https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400&h=300&fit=crop',
+    active: true,
+    expiresIn: '1 jam',
+    distance: '200m',
+  },
+  {
+    name: 'Roti Pisang',
+    store: 'Roti Ibu Tutik',
+    quantity: 5,
+    price: 3000,
+    originalPrice: 7000,
+    category: 'bakery',
+    image: 'https://images.unsplash.com/photo-1675712841671-cbcbe2c84103?w=400&h=300&fit=crop',
+    active: true,
+    expiresIn: '4 jam',
+    distance: '650m',
+  },
+  {
+    name: 'Mie Goreng',
+    store: 'Mie Ayam Pakde',
+    quantity: 4,
+    price: 7000,
+    originalPrice: 12000,
+    category: 'meals',
+    image: 'https://images.unsplash.com/photo-1772729219168-af0f0e57bb9c?w=400&h=300&fit=crop',
+    active: true,
+    expiresIn: '2 jam',
+    distance: '850m',
   },
 ];
 

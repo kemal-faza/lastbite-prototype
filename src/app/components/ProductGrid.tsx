@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { ProductCard } from './ProductCard';
-import { products, type Product } from '../data/products';
+import { type Product } from '../data/products';
 import { getSellerProducts, type SellerProduct } from '../data/sellerProducts';
 import type { SortOption } from './FilterBar';
 import type { FilterValues } from './FilterModal';
@@ -15,9 +15,9 @@ export function sellerProductToProduct(seller: SellerProduct): Product & { id: a
     originalPrice,
     discountedPrice: seller.price,
     discount: originalPrice > 0 ? Math.round((1 - seller.price / originalPrice) * 100) : 0,
-    expiresIn: '6 jam',
+    expiresIn: seller.expiresIn || '6 jam',
     remaining: seller.quantity,
-    distance: '1km',
+    distance: seller.distance || '1km',
     category: seller.category,
     image: seller.image || '',
   };
@@ -51,12 +51,9 @@ export function ProductGrid({
 	filters,
 }: ProductGridProps) {
 	const filteredProducts = useMemo(() => {
-		const allProducts = [
-			...products,
-			...getSellerProducts()
-				.filter((sp) => sp.active)
-				.map(sellerProductToProduct),
-		];
+		const allProducts = getSellerProducts()
+			.filter((sp) => sp.active)
+			.map(sellerProductToProduct);
 		let result = allProducts.filter((product) => {
 			const matchesCategory =
 				selectedCategory === 'all' ||

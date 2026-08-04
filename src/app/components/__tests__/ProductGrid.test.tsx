@@ -46,4 +46,24 @@ describe('sellerProductToProduct', () => {
     const product = sellerProductToProduct(seller);
     expect(product.discount).toBe(0);
   });
+
+  it('uses expiresIn and distance when provided by the seed catalog', () => {
+    const seller: SellerProduct = {
+      id: 'seed-6',
+      name: 'Roti Keju',
+      store: 'Roti Ibu Tutik',
+      quantity: 6,
+      price: 3500,
+      originalPrice: 8000,
+      category: 'bakery',
+      image: 'x.png',
+      active: true,
+      createdAt: 0,
+      expiresIn: '5 jam',
+      distance: '1.2km',
+    };
+    const product = sellerProductToProduct(seller);
+    expect(product.expiresIn).toBe('5 jam');
+    expect(product.distance).toBe('1.2km');
+  });
 });

@@ -14,20 +14,22 @@ beforeEach(() => {
 });
 
 describe('getSellerProducts', () => {
-  it('seeds 4 demo products when localStorage is empty', () => {
+  it('seeds 16 demo products when localStorage is empty', () => {
     const products = getSellerProducts();
-    expect(products).toHaveLength(4);
-    expect(products[0].name).toBe('Roti Coklat');
+    expect(products).toHaveLength(16);
+    expect(products[0].name).toBe('Ayam Preksu');
     expect(products[0].id).toBe('seed-1');
     expect(products[0].active).toBe(true);
-    expect(products[3].name).toBe('Dimsum Ayam');
-    expect(products[3].active).toBe(false); // demo inactive product
+    // Dimsum Ayam is the demo inactive product
+    const dimsum = products.find((p) => p.name === 'Dimsum Ayam');
+    expect(dimsum).toBeDefined();
+    expect(dimsum!.active).toBe(false);
   });
 
   it('does NOT re-seed when products already exist', () => {
     getSellerProducts(); // seeds
     const products = getSellerProducts();
-    expect(products).toHaveLength(4); // still 4, not doubled
+    expect(products).toHaveLength(16); // still 16, not doubled
   });
 
   it('returns empty array when localStorage has invalid JSON (corrupt)', () => {
@@ -70,8 +72,8 @@ describe('addSellerProduct', () => {
     };
     addSellerProduct(input);
     const products = getSellerProducts();
-    // 4 seed + 1 new = 5 total
-    expect(products).toHaveLength(5);
+    // 16 seed + 1 new = 17 total
+    expect(products).toHaveLength(17);
     const added = products.find((p) => p.id.startsWith('seller-'));
     expect(added).toBeDefined();
     expect(added!.name).toBe('Roti Baru');
@@ -96,8 +98,8 @@ describe('addSellerProduct', () => {
       originalPrice: 400,
       category: 'drinks',
     });
-    // 4 seed + 2 new = 6
-    expect(getSellerProducts()).toHaveLength(6);
+    // 16 seed + 2 new = 18
+    expect(getSellerProducts()).toHaveLength(18);
   });
 });
 
@@ -152,14 +154,14 @@ describe('deleteSellerProduct', () => {
     });
     const addedA = firstUserProduct()!;
     deleteSellerProduct(addedA.id);
-    // 4 seed + 1 remaining user product = 5
-    expect(getSellerProducts()).toHaveLength(5);
+    // 16 seed + 1 remaining user product = 17
+    expect(getSellerProducts()).toHaveLength(17);
   });
 
   it('can delete seed products too', () => {
     const seed = getSellerProducts(); // seeds
     deleteSellerProduct(seed[0].id);
-    expect(getSellerProducts()).toHaveLength(3);
+    expect(getSellerProducts()).toHaveLength(15);
   });
 
   it('does nothing if id not found', () => {

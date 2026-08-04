@@ -1,5 +1,7 @@
 import { Sparkles, Info } from 'lucide-react';
-import { products, type Product } from '../data/products';
+import { type Product } from '../data/products';
+import { getSellerProducts } from '../data/sellerProducts';
+import { sellerProductToProduct } from './ProductGrid';
 import { useNavigate } from 'react-router';
 import { useState, useMemo } from 'react';
 
@@ -43,8 +45,13 @@ function getScoreBreakdown(
 	product: Product,
 	currentCategory?: string,
 ): ScoreBreakdown {
+	// product.id can be a string (seller products) — derive a numeric seed
+	const idSeed =
+		typeof product.id === 'number'
+			? product.id
+			: product.id.split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
 	const seed =
-		product.id * 1000 +
+		idSeed * 1000 +
 		(currentCategory ? product.category.charCodeAt(0) * 7 : 0);
 
 	// 1. Category Match (0-40) -- deterministic dari seed
@@ -70,10 +77,15 @@ function getScoreBreakdown(
 }
 
 function getRecommendations(currentId?: number) {
-	const current = currentId ? products.find((p) => p.id === currentId) : null;
+	const allProducts = getSellerProducts()
+		.filter((sp) => sp.active)
+		.map(sellerProductToProduct);
+	const current = currentId
+		? allProducts.find((p) => p.id === currentId)
+		: null;
 	const currentCategory = current?.category;
 
-	const scored = products
+	const scored = allProducts
 		.filter((p) => p.id !== currentId)
 		.map((p) => {
 			const breakdown = getScoreBreakdown(p, currentCategory);

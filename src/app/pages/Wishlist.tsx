@@ -1,7 +1,8 @@
 import { Heart, ShoppingBag, ArrowLeft, Bell } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useWishlist } from '../context/WishlistContext';
-import { products } from '../data/products';
+import { getSellerProducts } from '../data/sellerProducts';
+import { sellerProductToProduct } from '../components/ProductGrid';
 import { ProductCard } from '../components/ProductCard';
 import { useState } from 'react';
 
@@ -38,7 +39,9 @@ export function Wishlist() {
   const { ids, count } = useWishlist();
   const navigate = useNavigate();
 
-  const wishlistedProducts = products.filter((p) => ids.includes(p.id));
+  const wishlistedProducts = getSellerProducts()
+    .filter((sp) => sp.active && ids.includes(sp.id))
+    .map(sellerProductToProduct);
 
   return (
     <div className="flex flex-col min-h-full bg-[var(--background)]">

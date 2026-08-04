@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { Search as SearchIcon, Clock, TrendingUp, X } from 'lucide-react';
-import { products } from '../data/products';
 import { getSellerProducts } from '../data/sellerProducts';
 import { sellerProductToProduct } from '../components/ProductGrid';
 import { ProductCard } from '../components/ProductCard';
@@ -21,12 +20,9 @@ export function Search() {
 	const searchResults = useMemo(() => {
 		if (!query.trim()) return [];
 		const q = query.toLowerCase();
-		const allProducts = [
-			...products,
-			...getSellerProducts()
-				.filter((sp) => sp.active)
-				.map(sellerProductToProduct),
-		];
+		const allProducts = getSellerProducts()
+			.filter((sp) => sp.active)
+			.map(sellerProductToProduct);
 		return allProducts.filter(
 			(p) =>
 				p.name.toLowerCase().includes(q) ||

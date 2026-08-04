@@ -10,7 +10,6 @@ import {
 	ShieldCheck,
 } from 'lucide-react';
 import { motion } from 'motion/react';
-import { products } from '../data/products';
 import { AIRecommendation } from '../components/AIRecommendation';
 import { getSellerProducts } from '../data/sellerProducts';
 import { sellerProductToProduct } from '../components/ProductGrid';
@@ -46,13 +45,10 @@ export function DetailProduct() {
 	const navigate = useNavigate();
 	const { items: cartItems, addItem, clearCart } = useCart();
 
-	const isSellerProduct = id?.startsWith('seller-');
-	const product = isSellerProduct
-		? (() => {
-				const seller = getSellerProducts().find((sp) => sp.id === id);
-				return seller ? sellerProductToProduct(seller) : undefined;
-			})()
-		: products.find((p) => p.id === Number(id));
+	const product = (() => {
+		const seller = getSellerProducts().find((sp) => sp.id === id);
+		return seller ? sellerProductToProduct(seller) : undefined;
+	})();
 	const [isMapOpen, setIsMapOpen] = useState(false);
 	const { toggle, isWishlisted } = useWishlist();
 	const isFav = isWishlisted(product.id);

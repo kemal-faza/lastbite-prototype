@@ -15,7 +15,7 @@ import { Link, useNavigate } from 'react-router';
 import { motion, AnimatePresence } from 'motion/react';
 import { useCart } from '../context/CartContext';
 import { useOrders } from '../context/OrderContext';
-import { products } from '../data/products';
+import { getSellerProducts } from '../data/sellerProducts';
 
 const STEPS = ['Keranjang', 'Pembayaran', 'Konfirmasi'];
 
@@ -167,8 +167,10 @@ export function Cart() {
 		<div className="p-4 space-y-4">
 			<div className="bg-white rounded-2xl shadow-sm overflow-hidden">
 				{items.map((item, index) => {
-					const productMaster = products.find((p) => p.id === item.id);
-					const maxStock = productMaster ? productMaster.remaining : 99;
+					const productMaster = getSellerProducts().find(
+						(p) => p.id === String(item.id),
+					);
+					const maxStock = productMaster ? productMaster.quantity : 99;
 					const isMaxStockReached = item.quantity >= maxStock;
 
 					return (

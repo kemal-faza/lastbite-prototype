@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer, type ReactNode } from 'react';
-import { products } from '../data/products';
+import { getSellerProducts } from '../data/sellerProducts';
 
 export interface CartItem {
   id: number;
@@ -21,12 +21,16 @@ interface CartState {
   items: CartItem[];
 }
 
+function findMaxStock(id: number): number {
+  const p = getSellerProducts().find((sp) => sp.id === String(id));
+  return p ? p.quantity : 99;
+}
+
 function cartReducer(state: CartState, action: CartAction): CartState {
   switch (action.type) {
     case 'ADD_ITEM': {
       const existing = state.items.find((i) => i.id === action.payload.id);
-      const product = products.find((p) => p.id === action.payload.id);
-      const maxStock = product ? product.remaining : 99;
+      const maxStock = findMaxStock(action.payload.id);
       if (existing) {
         const newQty = Math.min(maxStock, existing.quantity + 1);
         return {
@@ -42,8 +46,7 @@ function cartReducer(state: CartState, action: CartAction): CartState {
     case 'REMOVE_ITEM':
       return { items: state.items.filter((i) => i.id !== action.payload.id) };
     case 'UPDATE_QUANTITY': {
-      const product = products.find((p) => p.id === action.payload.id);
-      const maxStock = product ? product.remaining : 99;
+      const maxStock = findMaxStock(action.payload.id);
       return {
         items: state.items.map((item) => {
           if (item.id === action.payload.id) {

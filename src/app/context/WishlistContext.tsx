@@ -1,11 +1,11 @@
 import { createContext, useContext, useReducer, type ReactNode } from 'react';
 
 interface WishlistState {
-  ids: number[];
+  ids: string[];
 }
 
 type WishlistAction =
-  | { type: 'TOGGLE'; payload: { id: number } }
+  | { type: 'TOGGLE'; payload: { id: string } }
   | { type: 'CLEAR' };
 
 function wishlistReducer(state: WishlistState, action: WishlistAction): WishlistState {
@@ -26,18 +26,18 @@ function wishlistReducer(state: WishlistState, action: WishlistAction): Wishlist
 }
 
 const WishlistContext = createContext<{
-  ids: number[];
-  toggle: (id: number) => void;
-  isWishlisted: (id: number) => boolean;
+  ids: string[];
+  toggle: (id: string) => void;
+  isWishlisted: (id: string) => boolean;
   count: number;
 } | null>(null);
 
 export function WishlistProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(wishlistReducer, { ids: [] });
 
-  const toggle = (id: number) => dispatch({ type: 'TOGGLE', payload: { id } });
+  const toggle = (id: string) => dispatch({ type: 'TOGGLE', payload: { id } });
 
-  const isWishlisted = (id: number) => state.ids.includes(id);
+  const isWishlisted = (id: string) => state.ids.includes(id);
 
   return (
     <WishlistContext.Provider
