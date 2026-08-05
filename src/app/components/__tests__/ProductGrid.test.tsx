@@ -67,3 +67,28 @@ describe('sellerProductToProduct', () => {
     expect(product.distance).toBe('1.2km');
   });
 });
+
+describe('sellerProductToProduct notes mapping', () => {
+  const base: SellerProduct = {
+    id: 'seller-abc',
+    name: 'Roti Baru',
+    store: 'Toko Uji',
+    quantity: 10,
+    price: 5000,
+    originalPrice: 10000,
+    category: 'bakery',
+    image: '',
+    active: true,
+    createdAt: Date.now(),
+  };
+
+  it('memetakan notes saat ada', () => {
+    const product = sellerProductToProduct({ ...base, notes: 'Tanpa pengawet' });
+    expect(product.notes).toBe('Tanpa pengawet');
+  });
+
+  it('notes undefined saat tidak ada', () => {
+    const product = sellerProductToProduct(base);
+    expect(product.notes).toBeUndefined();
+  });
+});

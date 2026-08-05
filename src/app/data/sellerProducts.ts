@@ -255,7 +255,7 @@ export function addSellerProduct(
   input: Pick<
     SellerProduct,
     'name' | 'store' | 'quantity' | 'price' | 'originalPrice' | 'category'
-  > & { notes?: string },
+  > & { notes?: string; image?: string },
 ): void {
   const products = readAll();
   const newProduct: SellerProduct = {
@@ -267,7 +267,7 @@ export function addSellerProduct(
     originalPrice: input.originalPrice,
     category: input.category,
     notes: input.notes,
-    image: '',
+    image: input.image || '',
     active: true,
     createdAt: Date.now(),
   };

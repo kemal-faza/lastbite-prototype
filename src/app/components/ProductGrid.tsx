@@ -20,6 +20,7 @@ export function sellerProductToProduct(seller: SellerProduct): Product & { id: a
     distance: seller.distance || '1km',
     category: seller.category,
     image: seller.image || '',
+    notes: seller.notes,
   };
 }
 

@@ -10,4 +10,5 @@ export interface Product {
   distance: string;
   category: string;
   image: string;
+  notes?: string;
 }
