@@ -4,6 +4,7 @@ import {
 	Clock,
 	Heart,
 	MapPin,
+	NotebookPen,
 	Star,
 	Check,
 	ShoppingBag,
@@ -90,11 +91,24 @@ export function DetailProduct() {
 			<div className="flex-1 overflow-y-auto pb-44">
 				{/* Product image */}
 				<div className="relative">
-					<img
-						src={product.image}
-						alt={product.name}
-						className="w-full h-64 object-cover"
-					/>
+					{product.image ? (
+						<img
+							src={product.image}
+							alt={product.name}
+							className="w-full h-64 object-cover"
+						/>
+					) : (
+						<div className="w-full h-64 flex items-center justify-center bg-gray-100">
+							<div className="flex flex-col items-center gap-2">
+								<div className="w-14 h-14 bg-gray-200 rounded-full flex items-center justify-center">
+									<ShoppingBag className="w-7 h-7 text-gray-400" />
+								</div>
+								<span className="text-sm text-gray-400">
+									{product.name}
+								</span>
+							</div>
+						</div>
+					)}
 					<div className="absolute top-3 right-3 bg-[var(--destructive)] text-white px-3 py-1 rounded-full font-bold text-sm shadow-lg">
 						-{product.discount}%
 					</div>
@@ -179,6 +193,25 @@ export function DetailProduct() {
 					<div className="text-gray-500 text-sm space-y-0.5">
 						<p>Diproduksi: 12.00 WIB | Batas konsumsi: 19.00 WIB</p>
 					</div>
+
+					{/* Catatan dari penjual */}
+					{product.notes ? (
+						<div className="bg-amber-50 rounded-2xl border border-amber-100 p-4">
+							<div className="flex items-start gap-3">
+								<div className="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center shrink-0">
+									<NotebookPen className="w-4 h-4 text-amber-700" />
+								</div>
+								<div>
+									<h3 className="font-semibold text-gray-900 text-sm">
+										Catatan Produk
+									</h3>
+									<p className="text-xs text-gray-700 mt-1 leading-relaxed">
+										{product.notes}
+									</p>
+								</div>
+							</div>
+						</div>
+					) : null}
 
 					{/* Queue */}
 					<QueueIndicator
