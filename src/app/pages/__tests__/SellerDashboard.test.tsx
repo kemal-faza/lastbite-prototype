@@ -63,4 +63,37 @@ describe('SellerDashboard stats', () => {
     );
     expect(screen.queryByText('Roti Pisang')).not.toBeInTheDocument();
   });
+
+  it('Total Stok/Produk Aktif/Stok Tersisa hanya menghitung produk aktif', () => {
+    mockProducts = [
+      { id: 'seller-1', name: 'A', quantity: 10, price: 100, active: true },
+      { id: 'seller-2', name: 'B', quantity: 5, price: 200, active: true },
+      { id: 'seller-3', name: 'C', quantity: 3, price: 300, active: false },
+    ];
+    render(
+      <MemoryRouter>
+        <SellerDashboard />
+      </MemoryRouter>,
+    );
+    // Total Stok = 10+5+3 = 18
+    expect(screen.getByText('18')).toBeInTheDocument();
+    // Produk Aktif = 2
+    expect(screen.getAllByText('2').length).toBeGreaterThanOrEqual(1);
+    // Stok Tersisa = 10+5 = 15
+    expect(screen.getAllByText('15').length).toBeGreaterThanOrEqual(1);
+  });
+
+  it('menampilkan label "Stok Tersisa" dan bukan "Total Stok" dobel', () => {
+    mockProducts = [
+      { id: 'seller-1', name: 'A', quantity: 10, price: 100, active: true },
+    ];
+    render(
+      <MemoryRouter>
+        <SellerDashboard />
+      </MemoryRouter>,
+    );
+    expect(screen.getByText('Total Stok')).toBeInTheDocument();
+    expect(screen.getByText('Stok Tersisa')).toBeInTheDocument();
+    expect(screen.getAllByText('Total Stok')).toHaveLength(1);
+  });
 });

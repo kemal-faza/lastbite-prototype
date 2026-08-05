@@ -37,7 +37,8 @@ export function SellerDashboard() {
   const refresh = () => setProducts(getSellerProducts());
 
   const totalStock = products.reduce((sum, p) => sum + p.quantity, 0);
-  const remaining = products.reduce((sum, p) => sum + p.quantity, 0);
+  const activeProducts = products.filter((p) => p.active);
+  const activeStock = activeProducts.reduce((sum, p) => sum + p.quantity, 0);
 
   const handleDelete = (id: string) => {
     deleteSellerProduct(id);
@@ -107,15 +108,15 @@ export function SellerDashboard() {
             </div>
             <div className="flex-1 bg-white rounded-2xl shadow-sm px-4 py-5 text-center">
               <p className="text-2xl font-bold text-[var(--secondary)]">
-                {products.length}
+                {activeProducts.length}
               </p>
               <p className="text-xs text-gray-500 mt-1">Produk Aktif</p>
             </div>
             <div className="flex-1 bg-white rounded-2xl shadow-sm px-4 py-5 text-center">
               <p className="text-2xl font-bold text-[var(--destructive)]">
-                {remaining}
+                {activeStock}
               </p>
-              <p className="text-xs text-gray-500 mt-1">Total Stok</p>
+              <p className="text-xs text-gray-500 mt-1">Stok Tersisa</p>
             </div>
           </div>
         </section>
