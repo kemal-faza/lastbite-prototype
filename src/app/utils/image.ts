@@ -52,6 +52,9 @@ export async function compressImage(file: File): Promise<CompressResult> {
   try {
     const dataUrl = await readFileAsDataUrl(file);
     const img = await loadImage(dataUrl);
+    if (img.naturalWidth === 0 || img.naturalHeight === 0) {
+      return { error: 'File gambar tidak terbaca. Coba gunakan foto lain.' };
+    }
     const canvas = resizeToCanvas(img, 600);
     return { dataUrl: canvas.toDataURL('image/jpeg', 0.7) };
   } catch {

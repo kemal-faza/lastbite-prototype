@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ArrowLeft, Camera, X } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -25,15 +25,22 @@ export function AddProduct() {
   const [notes, setNotes] = useState('');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  // ref guard: mencegah double-submit tanpa menunggu re-render (state stale)
+  const submittingRef = useRef(false);
+  const selectSeq = useRef(0);
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    const seq = ++selectSeq.current;
     setSelectedFile(file);
     try {
       const preview = await readFileAsDataUrl(file);
+      if (seq !== selectSeq.current) return; // pilihan yang lebih baru menang
       setImagePreview(preview);
     } catch {
+      if (seq !== selectSeq.current) return;
       toast.error('Gagal membaca foto. Coba file lain.');
       setSelectedFile(null);
       setImagePreview(null);
@@ -42,37 +49,46 @@ export function AddProduct() {
   };
 
   const handleRemovePhoto = () => {
+    selectSeq.current++;
     setSelectedFile(null);
     setImagePreview(null);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (submittingRef.current) return; // cegah double-submit saat kompresi berjalan
     if (!productName || !category || !quantity || !price) {
       alert('Mohon isi nama produk, kategori, jumlah, dan harga!');
       return;
     }
-    let image: string | undefined;
-    if (selectedFile) {
-      const result = await compressImage(selectedFile);
-      if ('error' in result) {
-        toast.error(result.error);
-        return;
+    submittingRef.current = true;
+    setSubmitting(true);
+    try {
+      let image: string | undefined;
+      if (selectedFile) {
+        const result = await compressImage(selectedFile);
+        if ('error' in result) {
+          toast.error(result.error);
+          return;
+        }
+        image = result.dataUrl;
       }
-      image = result.dataUrl;
+      addSellerProduct({
+        name: productName,
+        store: 'Toko Anda',
+        quantity: parseInt(quantity) || 0,
+        price: parseInt(price) || 0,
+        originalPrice:
+          parseInt(originalPrice) || parseInt(price) * 2 || 0,
+        category: category as 'meals' | 'bakery' | 'drinks' | 'snacks',
+        notes: notes || undefined,
+        image,
+      });
+      navigate('/seller');
+    } finally {
+      submittingRef.current = false;
+      setSubmitting(false);
     }
-    addSellerProduct({
-      name: productName,
-      store: 'Toko Anda',
-      quantity: parseInt(quantity) || 0,
-      price: parseInt(price) || 0,
-      originalPrice:
-        parseInt(originalPrice) || parseInt(price) * 2 || 0,
-      category: category as 'meals' | 'bakery' | 'drinks' | 'snacks',
-      notes: notes || undefined,
-      image,
-    });
-    navigate('/seller');
   };
 
   return (
@@ -245,9 +261,10 @@ export function AddProduct() {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full bg-[var(--primary)] text-white font-semibold py-4 rounded-2xl hover:bg-[var(--primary)]/90 transition-colors shadow-sm"
+            disabled={submitting}
+            className="w-full bg-[var(--primary)] text-white font-semibold py-4 rounded-2xl hover:bg-[var(--primary)]/90 transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Upload Produk
+            {submitting ? 'Menyimpan...' : 'Upload Produk'}
           </button>
         </form>
       </div>

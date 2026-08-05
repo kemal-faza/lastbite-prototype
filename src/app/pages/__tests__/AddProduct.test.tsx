@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { AddProduct } from '../AddProduct';
@@ -147,5 +147,41 @@ describe('AddProduct', () => {
     expect(toast.error).toHaveBeenCalled();
     expect(toast.error).toHaveBeenCalledWith(expect.stringMatching(/gambar/i));
     expect(mockAdd).not.toHaveBeenCalled();
+  });
+
+  it('tidak menambahkan produk ganda saat tombol ditekan dua kali (submitting guard)', async () => {
+    const user = userEvent.setup();
+    let resolveCompress: ((v: { dataUrl: string }) => void) | undefined;
+    mockCompress.mockImplementationOnce(
+      () =>
+        new Promise<{ dataUrl: string }>((resolve) => {
+          resolveCompress = resolve;
+        }),
+    );
+    render(
+      <MemoryRouter>
+        <AddProduct />
+      </MemoryRouter>,
+    );
+    await user.type(screen.getByLabelText(/nama produk/i), 'Roti Baru');
+    await user.selectOptions(screen.getByLabelText(/kategori/i), 'meals');
+    await user.type(screen.getByLabelText(/jumlah sisa/i), '10');
+    await user.type(screen.getByLabelText(/harga diskon/i), '5000');
+    // Penting: upload file dulu agar selectedFile set → compressImage benar-benar pending
+    const file = new File(['foto'], 'foto.png', { type: 'image/png' });
+    await user.upload(screen.getByLabelText(/foto produk/i), file);
+    const btn = screen.getByRole('button', { name: /upload produk/i });
+    await user.click(btn);
+    // Klik kedua simulasi double-click same-tick (fireEvent bypass disabled btn)
+    // — ref guard harus menolak submit kedua sebelum compress selesai
+    fireEvent.click(btn);
+
+    // resolve kompresi → submit pertama selesai
+    resolveCompress?.({ dataUrl: 'data:image/jpeg;base64,FOTO-MOCK' });
+    await screen.findByRole('button', { name: /upload produk/i });
+
+    expect(mockCompress).toHaveBeenCalledTimes(1);
+    expect(mockAdd).toHaveBeenCalledTimes(1);
+    expect(mockNavigate).toHaveBeenCalledWith('/seller');
   });
 });

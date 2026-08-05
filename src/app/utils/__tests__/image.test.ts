@@ -45,8 +45,6 @@ function stubCanvas() {
         const canvas = { width: 0, height: 0 };
         created.push(canvas);
         return {
-          width: 0,
-          height: 0,
           get width() {
             return created[created.length - 1].width;
           },
@@ -121,6 +119,15 @@ describe('compressImage', () => {
         return originalCreate(tag, options);
       },
     );
+    const file = new File(['fake'], 'foto.png', { type: 'image/png' });
+    const result = await compressImage(file);
+    expect('error' in result).toBe(true);
+  });
+
+  it('menolak gambar degenerate (naturalWidth 0)', async () => {
+    stubFileReader('data:image/png;base64,ZmFrZQ==');
+    stubImage(0, 0); // gambar tidak terbaca dimensinya
+    stubCanvas();
     const file = new File(['fake'], 'foto.png', { type: 'image/png' });
     const result = await compressImage(file);
     expect('error' in result).toBe(true);
