@@ -1,14 +1,14 @@
-# LastBite — Solusi Digital Makanan Surplus
+# LastBite
 
-Aplikasi mobile yang menghubungkan penjual makanan sisa stok dengan pembeli yang mencari pilihan makan lebih murah, untuk menekan food waste. Dibuat untuk memenuhi tugas mata kuliah Interaksi Manusia dan Komputer — Departemen Informatika UNDIP 2026.
+LastBite mempertemukan mitra yang memiliki sisa stok makanan dengan pembeli yang mencari pilihan makan lebih murah tapi tetap layak. Lewat transaksi ini, food waste ikut ditekan. Proyek ini dibuat untuk memenuhi tugas mata kuliah Interaksi Manusia dan Komputer di Departemen Informatika UNDIP 2026.
 
 ## Fitur
 
-- **Explore** — Cari makanan surplus terdekat dengan harga diskon
-- **Detail Produk** — Lihat informasi lengkap, ulasan, dan label kebersihan
-- **Keranjang** — Atur jumlah pesanan, lihat ringkasan pembayaran
-- **Dashboard Penjual** — Kelola stok dan upload makanan surplus
-- **Konfirmasi Pesanan** — Kode pickup dan timer pengambilan
+- **Explore**: cari makanan surplus terdekat dengan harga diskon
+- **Detail Produk**: lihat informasi lengkap, ulasan, dan label kebersihan
+- **Keranjang**: atur jumlah pesanan, lihat ringkasan pembayaran
+- **Dashboard Penjual**: kelola stok dan unggah makanan surplus
+- **Konfirmasi Pesanan**: kode pickup dan timer pengambilan
 
 ## Tech Stack
 
