@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { AddProduct } from '../AddProduct';
+import { toast } from 'sonner';
 
 const mockNavigate = vi.fn();
 vi.mock('react-router', async () => {
@@ -18,9 +19,23 @@ vi.mock('../../data/sellerProducts', () => ({
   addSellerProduct: (...args: unknown[]) => mockAdd(...args),
 }));
 
+vi.mock('sonner', () => ({
+  toast: { error: vi.fn(), success: vi.fn() },
+}));
+
+const mockCompress = vi
+  .fn()
+  .mockResolvedValue({ dataUrl: 'data:image/jpeg;base64,FOTO-MOCK' });
+vi.mock('../../utils/image', () => ({
+  compressImage: (...args: unknown[]) => mockCompress(...args),
+  readFileAsDataUrl: () => Promise.resolve('data:image/png;base64,PREVIEW'),
+}));
+
 beforeEach(() => {
   mockNavigate.mockClear();
   mockAdd.mockClear();
+  mockCompress.mockClear();
+  (toast.error as ReturnType<typeof vi.fn>).mockClear();
 });
 
 describe('AddProduct', () => {
@@ -70,5 +85,67 @@ describe('AddProduct', () => {
 
     expect(mockAdd).toHaveBeenCalledTimes(1);
     expect(mockNavigate).toHaveBeenCalledWith('/seller');
+  });
+
+  it('menampilkan preview setelah memilih file foto', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <AddProduct />
+      </MemoryRouter>,
+    );
+    const file = new File(['foto'], 'foto.png', { type: 'image/png' });
+    await user.upload(screen.getByLabelText(/foto produk/i), file);
+    expect(
+      await screen.findByRole('button', { name: /hapus foto/i }),
+    ).toBeInTheDocument();
+  });
+
+  it('mengirim Data URL hasil kompresi ke addSellerProduct saat submit', async () => {
+    const user = userEvent.setup();
+    render(
+      <MemoryRouter>
+        <AddProduct />
+      </MemoryRouter>,
+    );
+    await user.type(screen.getByLabelText(/nama produk/i), 'Roti Baru');
+    await user.selectOptions(screen.getByLabelText(/kategori/i), 'meals');
+    await user.type(screen.getByLabelText(/jumlah sisa/i), '10');
+    await user.type(screen.getByLabelText(/harga diskon/i), '5000');
+    const file = new File(['foto'], 'foto.png', { type: 'image/png' });
+    await user.upload(screen.getByLabelText(/foto produk/i), file);
+    await user.click(screen.getByRole('button', { name: /upload produk/i }));
+
+    expect(mockCompress).toHaveBeenCalledTimes(1);
+    expect(mockCompress).toHaveBeenCalledWith(file);
+    expect(mockAdd).toHaveBeenCalledWith(
+      expect.objectContaining({ image: 'data:image/jpeg;base64,FOTO-MOCK' }),
+    );
+    expect(mockNavigate).toHaveBeenCalledWith('/seller');
+  });
+
+  it('menampilkan toast error saat foto bukan gambar dan tidak submit', async () => {
+    // applyAccept false: biarkan file non-gambar masuk ke input walau accept="image/*",
+    // supaya error validasi dari compressImage benar-benar diuji.
+    const user = userEvent.setup({ applyAccept: false });
+    mockCompress.mockResolvedValueOnce({
+      error: 'File harus berupa gambar (JPG/PNG, dll).',
+    });
+    render(
+      <MemoryRouter>
+        <AddProduct />
+      </MemoryRouter>,
+    );
+    await user.type(screen.getByLabelText(/nama produk/i), 'Roti Baru');
+    await user.selectOptions(screen.getByLabelText(/kategori/i), 'meals');
+    await user.type(screen.getByLabelText(/jumlah sisa/i), '10');
+    await user.type(screen.getByLabelText(/harga diskon/i), '5000');
+    const file = new File(['teks'], 'catatan.txt', { type: 'text/plain' });
+    await user.upload(screen.getByLabelText(/foto produk/i), file);
+    await user.click(screen.getByRole('button', { name: /upload produk/i }));
+
+    expect(toast.error).toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledWith(expect.stringMatching(/gambar/i));
+    expect(mockAdd).not.toHaveBeenCalled();
   });
 });

@@ -1,9 +1,11 @@
 import { useState } from 'react';
-import { ArrowLeft, Camera } from 'lucide-react';
+import { ArrowLeft, Camera, X } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { toast } from 'sonner';
 import { Input } from '../components/ui/input';
 import { Textarea } from '../components/ui/textarea';
 import { addSellerProduct } from '../data/sellerProducts';
+import { compressImage, readFileAsDataUrl } from '../utils/image';
 
 const CATEGORIES = [
   { value: '', label: 'Pilih kategori', disabled: true },
@@ -21,12 +23,43 @@ export function AddProduct() {
   const [price, setPrice] = useState('');
   const [originalPrice, setOriginalPrice] = useState('');
   const [notes, setNotes] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setSelectedFile(file);
+    try {
+      const preview = await readFileAsDataUrl(file);
+      setImagePreview(preview);
+    } catch {
+      toast.error('Gagal membaca foto. Coba file lain.');
+      setSelectedFile(null);
+      setImagePreview(null);
+    }
+    e.target.value = '';
+  };
+
+  const handleRemovePhoto = () => {
+    setSelectedFile(null);
+    setImagePreview(null);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!productName || !category || !quantity || !price) {
       alert('Mohon isi nama produk, kategori, jumlah, dan harga!');
       return;
+    }
+    let image: string | undefined;
+    if (selectedFile) {
+      const result = await compressImage(selectedFile);
+      if ('error' in result) {
+        toast.error(result.error);
+        return;
+      }
+      image = result.dataUrl;
     }
     addSellerProduct({
       name: productName,
@@ -37,6 +70,7 @@ export function AddProduct() {
         parseInt(originalPrice) || parseInt(price) * 2 || 0,
       category: category as 'meals' | 'bakery' | 'drinks' | 'snacks',
       notes: notes || undefined,
+      image,
     });
     navigate('/seller');
   };
@@ -166,15 +200,46 @@ export function AddProduct() {
             />
           </div>
 
-          {/* Upload Foto — placeholder */}
+          {/* Foto Produk */}
           <div className="space-y-2">
-            <label className="text-sm font-medium text-gray-700">
+            <label htmlFor="photo" className="text-sm font-medium text-gray-700">
               Foto Produk
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-2xl px-4 py-8 flex flex-col items-center justify-center text-gray-400 bg-gray-50">
-              <Camera className="w-8 h-8 mb-2" />
-              <span className="text-sm">Foto placeholder akan digunakan</span>
-            </div>
+            <input
+              id="photo"
+              type="file"
+              accept="image/*"
+              className="sr-only"
+              onChange={handleFileSelect}
+            />
+            {imagePreview ? (
+              <div className="relative rounded-2xl overflow-hidden border border-gray-200">
+                <img
+                  src={imagePreview}
+                  alt="Pratinjau foto produk"
+                  className="w-full h-48 object-cover"
+                />
+                <span className="absolute top-2 left-2 bg-green-600/90 text-white text-xs font-medium px-2 py-1 rounded-full">
+                  Foto siap diunggah
+                </span>
+                <button
+                  type="button"
+                  onClick={handleRemovePhoto}
+                  aria-label="Hapus foto"
+                  className="absolute top-2 right-2 p-1.5 bg-black/60 text-white rounded-full hover:bg-black/80 transition-colors"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            ) : (
+              <label
+                htmlFor="photo"
+                className="border-2 border-dashed border-gray-300 rounded-2xl px-4 py-8 flex flex-col items-center justify-center text-gray-400 bg-gray-50 cursor-pointer hover:border-gray-400 hover:bg-gray-100 transition-colors"
+              >
+                <Camera className="w-8 h-8 mb-2" />
+                <span className="text-sm">Klik untuk unggah foto (opsional, maks 5MB)</span>
+              </label>
+            )}
           </div>
 
           {/* Submit */}
